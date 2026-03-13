@@ -1,7 +1,7 @@
 import { useParams, useLocation, Link } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
-import { CheckCircle2, Circle, Play, ArrowRight, Award, BookOpen, X, Check, Laptop } from "lucide-react";
-import { useState, useEffect } from "react";
+import { CheckCircle2, Circle, Play, ArrowRight, Award, BookOpen, X, Check, Laptop, Lock } from "lucide-react";
+import { useState, useEffect, useRef } from "react";
 import { careers } from "@/data/careers";
 import GlassCard from "@/components/GlassCard";
 import GlowButton from "@/components/GlowButton";
@@ -29,6 +29,7 @@ const Roadmap = () => {
   const [activeModule, setActiveModule] = useState<string | null>(null);
   const [activeLesson, setActiveLesson] = useState<string | null>(null);
   const [lessonProgress, setLessonProgress] = useState<Record<string, "Not Started" | "In Progress" | "Completed">>({});
+  const playerRef = useRef<any>(null);
 
   // Initialize progress from localStorage
   useEffect(() => {
@@ -64,22 +65,47 @@ const Roadmap = () => {
     { id: `advanced-${modName.toLowerCase().replace(/\s+/g, '-')}`, title: `Advanced ${modName} Concepts`, videoId: "bJzb-RuUcMU" }
   ];
 
+  useEffect(() => {
+    const checkProgress = () => {
+      if (playerRef.current && activeModule && activeLesson) {
+        if (typeof playerRef.current.getPlayerState === 'function' && playerRef.current.getPlayerState() === 1) { // 1 = playing
+          const currentTime = playerRef.current.getCurrentTime();
+          const duration = playerRef.current.getDuration();
+          if (duration > 0 && (currentTime / duration) >= 0.9) {
+            setLessonProgress(prev => {
+              if (prev[activeLesson] !== "Completed") {
+                // Call update outside if possible, but safe here with functional update mechanism
+                updateLessonStatus(activeModule, activeLesson, "Completed");
+              }
+              return prev;
+            });
+          }
+        }
+      }
+    };
+    const interval = setInterval(checkProgress, 2000);
+    return () => clearInterval(interval);
+  }, [activeModule, activeLesson]);
+
   const updateLessonStatus = (modId: string, lessonId: string, status: "In Progress" | "Completed") => {
     setLessonProgress(prev => {
+      if (prev[lessonId] === status) return prev;
+      
       const newProgress = { ...prev, [lessonId]: status };
       localStorage.setItem(`lesson_status_${subjectName}_${modId}_${lessonId}`, status);
       
-      // Check if module is now complete
       if (status === "Completed") {
-        toast.success("Great job! You've completed this lesson.", { icon: "🤖" });
-        
         const lessons = getLessonsForModule(modules.find(m => m.toLowerCase().replace(/\s+/g, '-') === modId) || "");
         const allCompleted = lessons.every(l => newProgress[l.id] === "Completed" || l.id === lessonId);
         
+        const currentIdx = lessons.findIndex(l => l.id === lessonId);
+        const nextLesson = lessons[currentIdx + 1];
+
         if (allCompleted) {
+          toast.success("Great job! You completed the lesson.", { icon: "🤖" });
           markModuleComplete(modId);
-        } else {
-          toast.info("Nice progress! Keep going to finish the module.", { icon: "🤖", duration: 4000 });
+        } else if (nextLesson) {
+          toast.success(`Great job! You completed the lesson. Ready for the next challenge? Start the "${nextLesson.title}" lesson.`, { icon: "🤖", duration: 5000 });
         }
       }
       return newProgress;
@@ -100,8 +126,11 @@ const Roadmap = () => {
 
   const handleLessonOpen = (modId: string, lessonId: string) => {
     setActiveLesson(lessonId);
-    if (lessonProgress[lessonId] !== "Completed") {
-      updateLessonStatus(modId, lessonId, "In Progress");
+  };
+
+  const handleVideoPlay = () => {
+    if (activeModule && activeLesson && lessonProgress[activeLesson] !== "Completed") {
+      updateLessonStatus(activeModule, activeLesson, "In Progress");
     }
   };
 
@@ -208,28 +237,36 @@ const Roadmap = () => {
             {activeModule && !activeLesson && (
               <div className="mt-4 space-y-4">
                 <p className="text-muted-foreground mb-6">Complete all lessons in this module to mark it as completed.</p>
-                {getLessonsForModule(modules.find(m => m.toLowerCase().replace(/\s+/g, '-') === activeModule) || "").map((lesson, idx) => {
+                {getLessonsForModule(modules.find(m => m.toLowerCase().replace(/\s+/g, '-') === activeModule) || "").map((lesson, idx, arr) => {
                   const status = lessonProgress[lesson.id] || "Not Started";
+                  const isLocked = idx > 0 && lessonProgress[arr[idx - 1].id] !== "Completed";
+                  
                   return (
-                    <div key={lesson.id} className="p-4 rounded-xl border bg-card hover:bg-accent/5 transition-colors cursor-pointer" onClick={() => handleLessonOpen(activeModule, lesson.id)}>
+                    <div 
+                      key={lesson.id} 
+                      className={`p-4 rounded-xl border transition-colors ${isLocked ? 'opacity-60 bg-muted cursor-not-allowed' : 'bg-card hover:bg-accent/5 cursor-pointer'}`} 
+                      onClick={() => !isLocked && handleLessonOpen(activeModule, lesson.id)}
+                    >
                       <div className="flex items-start justify-between">
                         <div className="flex gap-4 items-center">
-                          <div className={`w-10 h-10 rounded-full flex items-center justify-center font-bold ${status === 'Completed' ? 'bg-green-500 text-white' : status === 'In Progress' ? 'bg-blue-500 text-white' : 'bg-secondary text-secondary-foreground'}`}>
-                            {status === 'Completed' ? <Check className="h-5 w-5" /> : idx + 1}
+                          <div className={`w-10 h-10 rounded-full flex items-center justify-center font-bold ${status === 'Completed' ? 'bg-green-500 text-white' : isLocked ? 'bg-muted-foreground/20 text-muted-foreground' : status === 'In Progress' ? 'bg-blue-500 text-white' : 'bg-secondary text-secondary-foreground'}`}>
+                            {status === 'Completed' ? <Check className="h-5 w-5" /> : isLocked ? <Lock className="h-4 w-4" /> : idx + 1}
                           </div>
                           <div>
                             <h4 className={`font-semibold text-lg ${status === 'Completed' ? 'text-muted-foreground line-through' : ''}`}>{lesson.title}</h4>
                             <div className="flex items-center gap-2 mt-1">
-                              <Play className="h-3.5 w-3.5 text-primary" />
-                              <span className="text-xs text-muted-foreground">Video Lesson</span>
-                              <Badge variant={status === 'Completed' ? 'default' : status === 'In Progress' ? 'secondary' : 'outline'} className={status === 'Completed' ? 'bg-green-500' : ''}>
-                                {status}
-                              </Badge>
+                              {isLocked ? <Lock className="h-3.5 w-3.5 text-muted-foreground" /> : <Play className="h-3.5 w-3.5 text-primary" />}
+                              <span className="text-xs text-muted-foreground">{isLocked ? 'Locked' : 'Video Lesson'}</span>
+                              {!isLocked && (
+                                <Badge variant={status === 'Completed' ? 'default' : status === 'In Progress' ? 'secondary' : 'outline'} className={status === 'Completed' ? 'bg-green-500' : ''}>
+                                  {status}
+                                </Badge>
+                              )}
                             </div>
                           </div>
                         </div>
-                        <Button variant="ghost" size="icon">
-                          <ArrowRight className="h-5 w-5" />
+                        <Button variant="ghost" size="icon" disabled={isLocked}>
+                          {isLocked ? <Lock className="h-5 w-5 opacity-50" /> : <ArrowRight className="h-5 w-5" />}
                         </Button>
                       </div>
                     </div>
@@ -250,6 +287,8 @@ const Roadmap = () => {
                     className="w-full h-full absolute inset-0"
                     opts={{ width: '100%', height: '100%', playerVars: { autoplay: 1 } }}
                     onEnd={handleVideoEnd}
+                    onPlay={handleVideoPlay}
+                    onReady={(e) => { playerRef.current = e.target; }}
                   />
                 </div>
                 
