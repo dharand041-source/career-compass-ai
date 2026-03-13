@@ -89,6 +89,18 @@ export const jobListings = [
   { id: 6, title: "DevOps Engineer", company: "CloudFirst", location: "Remote", type: "Full-time", skills: ["Docker", "AWS", "CI/CD"], salary: "$100k - $130k" },
   { id: 7, title: "Backend Developer", company: "APIworks", location: "Seattle, WA", type: "Full-time", skills: ["Node.js", "REST APIs", "MongoDB"], salary: "$85k - $110k" },
   { id: 8, title: "ML Engineering Intern", company: "AI Labs", location: "Boston, MA", type: "Internship", skills: ["Python", "TensorFlow", "Mathematics"], salary: "$30/hr" },
+  { id: 9, title: "Mobile App Developer", company: "AppVenture", location: "Los Angeles, CA", type: "Full-time", skills: ["React Native", "JavaScript", "iOS/Android"], salary: "$75k - $95k" },
+  { id: 10, title: "Cybersecurity Analyst", company: "SecureNet", location: "Washington, DC", type: "Full-time", skills: ["Network Security", "Linux", "SIEM"], salary: "$80k - $110k" },
+  { id: 11, title: "Product Manager Intern", company: "ProductCo", location: "Chicago, IL", type: "Internship", skills: ["Agile", "User Research", "Analytics"], salary: "$22/hr" },
+  { id: 12, title: "Data Scientist", company: "InsightAI", location: "Remote", type: "Full-time", skills: ["Python", "Machine Learning", "Statistics"], salary: "$95k - $130k" },
+  { id: 13, title: "QA Engineer", company: "QualityFirst", location: "Denver, CO", type: "Full-time", skills: ["Selenium", "Java", "Test Automation"], salary: "$70k - $90k" },
+  { id: 14, title: "Cloud Architect", company: "CloudTech", location: "Remote", type: "Full-time", skills: ["AWS", "Azure", "Terraform"], salary: "$120k - $150k" },
+  { id: 15, title: "Frontend Developer", company: "WebSolutions", location: "Miami, FL", type: "Full-time", skills: ["Vue.js", "JavaScript", "Tailwind CSS"], salary: "$65k - $85k" },
+  { id: 16, title: "Database Administrator", company: "DataCorp", location: "Phoenix, AZ", type: "Full-time", skills: ["PostgreSQL", "MySQL", "Performance Tuning"], salary: "$75k - $100k" },
+  { id: 17, title: "AI Research Intern", company: "FutureAI", location: "Palo Alto, CA", type: "Internship", skills: ["Python", "PyTorch", "Research"], salary: "$35/hr" },
+  { id: 18, title: "Systems Engineer", company: "InfraTech", location: "Atlanta, GA", type: "Full-time", skills: ["Linux", "Networking", "Shell Scripting"], salary: "$85k - $115k" },
+  { id: 19, title: "Technical Writer", company: "DocuTech", location: "Remote", type: "Contract", skills: ["Technical Writing", "API Documentation", "Markdown"], salary: "$50k - $70k" },
+  { id: 20, title: "Blockchain Developer", company: "CryptoChain", location: "New York, NY", type: "Full-time", skills: ["Solidity", "Web3", "Ethereum"], salary: "$90k - $120k" },
 ];
 
 export const leaderboardData = [

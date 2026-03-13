@@ -5,6 +5,8 @@ import { generateQuestions, careers } from "@/data/careers";
 import GlowButton from "@/components/GlowButton";
 import AnimatedProgress from "@/components/AnimatedProgress";
 import Navbar from "@/components/Navbar";
+import SkillGapAnalysis from "@/components/SkillGapAnalysis";
+import { updateUserProgress } from "@/lib/jobService";
 
 const Assessment = () => {
   const { careerId } = useParams<{ careerId: string }>();
@@ -15,6 +17,8 @@ const Assessment = () => {
   const [current, setCurrent] = useState(0);
   const [answers, setAnswers] = useState<number[]>([]);
   const [selected, setSelected] = useState<number | null>(null);
+  const [showSkillGap, setShowSkillGap] = useState(false);
+  const [assessmentScore, setAssessmentScore] = useState(0);
 
   const handleNext = () => {
     if (selected === null) return;
@@ -24,11 +28,32 @@ const Assessment = () => {
 
     if (current + 1 >= questions.length) {
       const score = newAnswers.reduce((acc, a, i) => acc + (a === questions[i].correctIndex ? 1 : 0), 0);
-      navigate(`/roadmap/${careerId}`, { state: { score, total: questions.length } });
+      setAssessmentScore(score);
+      setShowSkillGap(true);
     } else {
       setCurrent(current + 1);
     }
   };
+
+  const handleSkillGapComplete = () => {
+    navigate(`/roadmap/${careerId}`, { state: { score: assessmentScore, total: questions.length } });
+  };
+
+  if (showSkillGap) {
+    return (
+      <div className="min-h-screen animated-gradient-bg">
+        <Navbar />
+        <div className="container mx-auto px-6 pt-28 pb-16 max-w-4xl">
+          <SkillGapAnalysis
+            careerId={careerId || "software-dev"}
+            assessmentScore={assessmentScore}
+            totalQuestions={questions.length}
+            onComplete={handleSkillGapComplete}
+          />
+        </div>
+      </div>
+    );
+  }
 
   const q = questions[current];
 

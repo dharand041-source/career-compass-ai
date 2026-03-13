@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -6,25 +6,12 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Checkbox } from "@/components/ui/checkbox";
-import { MapPin, DollarSign, Clock, Building, ExternalLink, Bot, Send } from "lucide-react";
+import { MapPin, DollarSign, Clock, Building, ExternalLink, Bot, Send, Loader2, AlertCircle, Target, GraduationCap } from "lucide-react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { recordActivity } from "@/lib/supabaseLeaderboard";
 import { useToast } from "@/components/ui/use-toast";
-
-interface Job {
-  id: string;
-  title: string;
-  company: string;
-  location: string;
-  type: "Full-time" | "Part-time" | "Internship" | "Contract";
-  salary: string;
-  description: string;
-  requirements: string[];
-  postedDate: string;
-  matchScore: number;
-  remote: boolean;
-}
+import { fetchJobsForUser, searchJobs, Job, getUserProfile, updateUserProgress } from "@/lib/jobService";
 
 interface Message {
   id: string;
@@ -33,143 +20,93 @@ interface Message {
   timestamp: Date;
 }
 
-const jobs: Job[] = [
-  {
-    id: "1",
-    title: "Frontend Developer",
-    company: "TechCorp Inc.",
-    location: "San Francisco, CA",
-    type: "Full-time",
-    salary: "$80,000 - $120,000",
-    description: "We are looking for a skilled Frontend Developer to join our team. You will be responsible for building user-facing web applications using modern technologies.",
-    requirements: ["React", "JavaScript", "CSS", "Git", "3+ years experience"],
-    postedDate: "2 days ago",
-    matchScore: 95,
-    remote: true,
-  },
-  {
-    id: "2",
-    title: "Data Analyst Intern",
-    company: "DataDriven Solutions",
-    location: "New York, NY",
-    type: "Internship",
-    salary: "$25/hour",
-    description: "Join our data team as an intern and learn how to analyze large datasets, create visualizations, and derive insights from data.",
-    requirements: ["Python", "SQL", "Excel", "Statistics", "Enrolled in college"],
-    postedDate: "1 week ago",
-    matchScore: 88,
-    remote: false,
-  },
-  {
-    id: "3",
-    title: "UX Designer",
-    company: "Creative Agency",
-    location: "Austin, TX",
-    type: "Full-time",
-    salary: "$70,000 - $90,000",
-    description: "Design intuitive user experiences for web and mobile applications. Work closely with product managers and developers.",
-    requirements: ["Figma", "Adobe Creative Suite", "User Research", "Prototyping", "2+ years experience"],
-    postedDate: "3 days ago",
-    matchScore: 82,
-    remote: true,
-  },
-  {
-    id: "4",
-    title: "Backend Engineer",
-    company: "StartupXYZ",
-    location: "Seattle, WA",
-    type: "Full-time",
-    salary: "$90,000 - $130,000",
-    description: "Build scalable backend systems and APIs. Work with microservices architecture and cloud technologies.",
-    requirements: ["Node.js", "Python", "AWS", "Docker", "MongoDB", "5+ years experience"],
-    postedDate: "5 days ago",
-    matchScore: 76,
-    remote: false,
-  },
-];
-
 const JobsInternships = () => {
   const { toast } = useToast();
-  const [filteredJobs, setFilteredJobs] = useState(jobs);
-  const [searchTerm, setSearchTerm] = useState("");
-  const [locationFilter, setLocationFilter] = useState("");
-  const [typeFilter, setTypeFilter] = useState("");
-  const [remoteOnly, setRemoteOnly] = useState(false);
-  const [selectedJob, setSelectedJob] = useState<Job | null>(null);
+  const [jobs, setJobs] = useState<Job[]>([]);
+  const [internships, setInternships] = useState<Job[]>([]);
+  const [filteredJobs, setFilteredJobs] = useState<Job[]>([]);
+  const [filteredInternships, setFilteredInternships] = useState<Job[]>([]);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
   const [messages, setMessages] = useState<Message[]>([
     {
-      id: "1",
-      text: "Hi! I'm your AI Job Assistant. I can help you prepare for job applications, review your resume, or suggest improvements. What would you like help with?",
+      id: '1',
+      text: "Hi! I'm your AI job assistant. I can help you with job search strategies, resume tips, interview preparation, and more. What would you like to know?",
       isBot: true,
-      timestamp: new Date(),
-    },
+      timestamp: new Date()
+    }
   ]);
-  const [chatInput, setChatInput] = useState("");
+  const [inputMessage, setInputMessage] = useState('');
+  const [isTyping, setIsTyping] = useState(false);
 
-  const applyFilters = () => {
-    const filtered = jobs.filter(job => {
-      const matchesSearch = job.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                           job.company.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                           job.description.toLowerCase().includes(searchTerm.toLowerCase());
-      const matchesLocation = !locationFilter || job.location.toLowerCase().includes(locationFilter.toLowerCase());
-      const matchesType = !typeFilter || job.type === typeFilter;
-      const matchesRemote = !remoteOnly || job.remote;
-
-      return matchesSearch && matchesLocation && matchesType && matchesRemote;
-    });
-
-    // Sort by match score
-    filtered.sort((a, b) => b.matchScore - a.matchScore);
-
-    setFilteredJobs(filtered);
-  };
-
-  const handleChatSend = () => {
-    if (!chatInput.trim()) return;
-
-    const userMessage: Message = {
-      id: Date.now().toString(),
-      text: chatInput,
-      isBot: false,
-      timestamp: new Date(),
-    };
-
-    setMessages(prev => [...prev, userMessage]);
-    setChatInput("");
-
-    // Simulate AI response
-    setTimeout(() => {
-      const botResponse = generateAIResponse(chatInput);
-      const botMessage: Message = {
-        id: (Date.now() + 1).toString(),
-        text: botResponse,
-        isBot: true,
-        timestamp: new Date(),
-      };
-      setMessages(prev => [...prev, botMessage]);
-    }, 1000);
-  };
-
-  const generateAIResponse = (userInput: string): string => {
-    const input = userInput.toLowerCase();
-
-    if (input.includes("resume") || input.includes("cv")) {
-      return "For your resume, focus on quantifiable achievements. Instead of 'Responsible for team projects', say 'Led a team of 5 to deliver a project 2 weeks early, resulting in 15% cost savings'. Would you like me to review a specific section?";
-    } else if (input.includes("interview")) {
-      return "Prepare for interviews by researching the company, practicing STAR method for behavioral questions, and preparing technical questions. Common questions: 'Tell me about yourself', 'Why do you want to work here?', 'What's your greatest weakness?'";
-    } else if (input.includes("cover letter")) {
-      return "A good cover letter should be 3-4 paragraphs: introduction with how you found the job, body highlighting relevant experience, conclusion with call to action. Keep it under 400 words and customize for each application.";
-    } else if (input.includes("salary") || input.includes("negotiate")) {
-      return "Research salary ranges on sites like Glassdoor or Levels.fyi. Consider your experience, location, and company size. Practice negotiation: 'Based on my research and experience, I'm looking for X-Y range. What do you think?'";
-    } else {
-      return "I can help with resume reviews, interview preparation, cover letter writing, salary negotiation, or general job search advice. What specific area would you like assistance with?";
+  const loadJobs = async () => {
+    try {
+      setLoading(true);
+      setError(null);
+      console.log('Fetching jobs for user...');
+      const fetchedJobs = await fetchJobsForUser();
+      console.log('Fetched jobs:', fetchedJobs);
+      
+      if (!Array.isArray(fetchedJobs)) {
+        throw new Error('Invalid response: expected array of jobs');
+      }
+      
+      // Separate jobs and internships
+      const jobsOnly = fetchedJobs.filter(job => job && job.type !== 'Internship');
+      const internshipsOnly = fetchedJobs.filter(job => job && job.type === 'Internship');
+      
+      setJobs(jobsOnly);
+      setInternships(internshipsOnly);
+      setFilteredJobs(jobsOnly);
+      setFilteredInternships(internshipsOnly);
+    } catch (err) {
+      console.error('Error fetching jobs:', err);
+      setError(err instanceof Error ? err.message : 'Failed to load jobs. Please try again.');
+    } finally {
+      setLoading(false);
     }
   };
 
-  const getMatchScoreColor = (score: number) => {
-    if (score >= 90) return "bg-green-100 text-green-800";
-    if (score >= 80) return "bg-yellow-100 text-yellow-800";
-    return "bg-orange-100 text-orange-800";
+  // Fetch jobs on component mount
+  useEffect(() => {
+    console.log('JobsInternships component mounted');
+    loadJobs();
+  }, []);
+
+  const handleSendMessage = async () => {
+    if (!inputMessage.trim()) return;
+
+    const userMessage: Message = {
+      id: Date.now().toString(),
+      text: inputMessage,
+      isBot: false,
+      timestamp: new Date()
+    };
+
+    setMessages(prev => [...prev, userMessage]);
+    setInputMessage('');
+    setIsTyping(true);
+
+    // Simulate AI response
+    setTimeout(() => {
+      const responses = [
+        "That's a great question! Based on your profile, I'd recommend focusing on roles that match your current skill level.",
+        "I can help you prepare for interviews. Would you like some common questions and tips?",
+        "Networking is key in job hunting. Consider reaching out to professionals in your target companies.",
+        "Your resume looks strong! Make sure to tailor it for each application by highlighting relevant experience.",
+        "Practice makes perfect! Try mock interviews to build confidence before applying to positions."
+      ];
+
+      const botMessage: Message = {
+        id: (Date.now() + 1).toString(),
+        text: responses[Math.floor(Math.random() * responses.length)],
+        isBot: true,
+        timestamp: new Date()
+      };
+
+      setMessages(prev => [...prev, botMessage]);
+      setIsTyping(false);
+    }, 1000);
   };
 
   return (
@@ -189,245 +126,291 @@ const JobsInternships = () => {
           </p>
         </motion.div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
-          {/* Filters Sidebar */}
-          <div className="lg:col-span-1">
-            <Card className="sticky top-8">
-              <CardHeader>
-                <CardTitle>Filters</CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <div>
-                  <label className="text-sm font-medium mb-2 block">Search</label>
-                  <Input
-                    placeholder="Job title, company, or keywords"
-                    value={searchTerm}
-                    onChange={(e) => setSearchTerm(e.target.value)}
-                  />
-                </div>
-
-                <div>
-                  <label className="text-sm font-medium mb-2 block">Location</label>
-                  <Input
-                    placeholder="City, State, or Remote"
-                    value={locationFilter}
-                    onChange={(e) => setLocationFilter(e.target.value)}
-                  />
-                </div>
-
-                <div>
-                  <label className="text-sm font-medium mb-2 block">Job Type</label>
-                  <Select value={typeFilter} onValueChange={setTypeFilter}>
-                    <SelectTrigger>
-                      <SelectValue placeholder="All types" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="">All types</SelectItem>
-                      <SelectItem value="Full-time">Full-time</SelectItem>
-                      <SelectItem value="Part-time">Part-time</SelectItem>
-                      <SelectItem value="Internship">Internship</SelectItem>
-                      <SelectItem value="Contract">Contract</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-
-                <div className="flex items-center space-x-2">
-                  <Checkbox
-                    id="remote"
-                    checked={remoteOnly}
-                    onCheckedChange={setRemoteOnly}
-                  />
-                  <label htmlFor="remote" className="text-sm font-medium">
-                    Remote only
-                  </label>
-                </div>
-
-                <Button onClick={applyFilters} className="w-full">
-                  Apply Filters
-                </Button>
-              </CardContent>
-            </Card>
+        {loading ? (
+          <div className="flex flex-col items-center justify-center py-12">
+            <Loader2 className="h-8 w-8 animate-spin text-primary mb-4" />
+            <p className="text-muted-foreground">Finding the perfect matches for you...</p>
           </div>
-
-          {/* Main Content */}
-          <div className="lg:col-span-2">
-            <Tabs defaultValue="jobs" className="w-full">
-              <TabsList className="grid w-full grid-cols-2">
-                <TabsTrigger value="jobs">Job Listings ({filteredJobs.length})</TabsTrigger>
-                <TabsTrigger value="assistant">AI Assistant</TabsTrigger>
-              </TabsList>
-
-              <TabsContent value="jobs" className="mt-6">
-                <div className="space-y-4">
-                  {filteredJobs.map((job) => (
-                    <Card
-                      key={job.id}
-                      className="cursor-pointer transition-all hover:shadow-lg"
-                      onClick={() => setSelectedJob(job)}
-                    >
-                      <CardContent className="p-6">
-                        <div className="flex justify-between items-start mb-3">
-                          <div>
-                            <h3 className="font-bold text-lg mb-1">{job.title}</h3>
-                            <div className="flex items-center gap-2 text-muted-foreground mb-2">
-                              <Building className="h-4 w-4" />
-                              <span>{job.company}</span>
-                              <MapPin className="h-4 w-4 ml-2" />
-                              <span>{job.location}</span>
-                              {job.remote && <Badge variant="secondary">Remote</Badge>}
-                            </div>
-                          </div>
-                          <Badge className={getMatchScoreColor(job.matchScore)}>
-                            {job.matchScore}% match
-                          </Badge>
-                        </div>
-
-                        <p className="text-sm text-muted-foreground mb-3 line-clamp-2">
-                          {job.description}
-                        </p>
-
-                        <div className="flex items-center justify-between">
-                          <div className="flex items-center gap-4 text-sm">
-                            <div className="flex items-center gap-1">
-                              <DollarSign className="h-4 w-4" />
-                              <span>{job.salary}</span>
-                            </div>
-                            <Badge variant="outline">{job.type}</Badge>
-                          </div>
-                          <div className="flex items-center gap-1 text-xs text-muted-foreground">
-                            <Clock className="h-3 w-3" />
-                            <span>{job.postedDate}</span>
-                          </div>
-                        </div>
-                      </CardContent>
-                    </Card>
-                  ))}
-                </div>
-              </TabsContent>
-
-              <TabsContent value="assistant" className="mt-6">
-                <Card className="h-[600px] flex flex-col">
-                  <CardHeader className="flex flex-row items-center gap-2">
-                    <Bot className="h-5 w-5 text-primary" />
-                    <CardTitle>AI Job Assistant</CardTitle>
-                  </CardHeader>
-                  <CardContent className="flex-1 flex flex-col p-0">
-                    <ScrollArea className="flex-1 p-4">
-                      <div className="space-y-4">
-                        {messages.map((message) => (
-                          <div
-                            key={message.id}
-                            className={`flex ${message.isBot ? "justify-start" : "justify-end"}`}
-                          >
-                            <div
-                              className={`max-w-[80%] p-3 rounded-lg ${
-                                message.isBot
-                                  ? "bg-primary/10 text-foreground"
-                                  : "bg-primary text-primary-foreground"
-                              }`}
-                            >
-                              <p className="text-sm">{message.text}</p>
-                              <span className="text-xs opacity-70 mt-1 block">
-                                {message.timestamp.toLocaleTimeString()}
-                              </span>
-                            </div>
-                          </div>
-                        ))}
-                      </div>
-                    </ScrollArea>
-                    <div className="p-4 border-t">
-                      <div className="flex gap-2">
-                        <Input
-                          value={chatInput}
-                          onChange={(e) => setChatInput(e.target.value)}
-                          onKeyPress={(e) => e.key === "Enter" && handleChatSend()}
-                          placeholder="Ask for help with job applications..."
-                          className="flex-1"
-                        />
-                        <Button onClick={handleChatSend} size="sm">
-                          <Send className="h-4 w-4" />
-                        </Button>
-                      </div>
-                    </div>
-                  </CardContent>
-                </Card>
-              </TabsContent>
-            </Tabs>
-          </div>
-
-          {/* Job Details Sidebar */}
-          <div className="lg:col-span-1">
-            {selectedJob ? (
+        ) : error ? (
+          <Card className="p-6">
+            <div className="flex items-center gap-3 text-destructive">
+              <AlertCircle className="h-5 w-5" />
+              <div>
+                <h3 className="font-medium">Unable to load jobs</h3>
+                <p className="text-sm text-muted-foreground mt-1">{error}</p>
+              </div>
+            </div>
+            <Button
+              onClick={loadJobs}
+              className="mt-4"
+              variant="outline"
+            >
+              Try Again
+            </Button>
+          </Card>
+        ) : (
+          <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
+            {/* Filters Sidebar */}
+            <div className="lg:col-span-1">
               <Card className="sticky top-8">
                 <CardHeader>
-                  <CardTitle className="text-lg">{selectedJob.title}</CardTitle>
-                  <div className="flex items-center gap-2 text-muted-foreground">
-                    <Building className="h-4 w-4" />
-                    <span>{selectedJob.company}</span>
-                  </div>
+                  <CardTitle>Filters</CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-4">
-                  <div className="flex items-center gap-2">
-                    <MapPin className="h-4 w-4" />
-                    <span className="text-sm">{selectedJob.location}</span>
-                    {selectedJob.remote && <Badge variant="secondary">Remote</Badge>}
-                  </div>
-
-                  <div className="flex items-center gap-2">
-                    <DollarSign className="h-4 w-4" />
-                    <span className="text-sm font-medium">{selectedJob.salary}</span>
-                  </div>
-
-                  <div className="flex items-center gap-2">
-                    <Clock className="h-4 w-4" />
-                    <span className="text-sm">Posted {selectedJob.postedDate}</span>
-                  </div>
-
-                  <Badge className={getMatchScoreColor(selectedJob.matchScore)}>
-                    {selectedJob.matchScore}% match
-                  </Badge>
-
                   <div>
-                    <h4 className="font-medium mb-2">Requirements</h4>
-                    <ul className="text-sm space-y-1">
-                      {selectedJob.requirements.map((req, index) => (
-                        <li key={index} className="flex items-center gap-2">
-                          <span className="w-1.5 h-1.5 bg-primary rounded-full"></span>
-                          {req}
-                        </li>
-                      ))}
-                    </ul>
+                    <label className="text-sm font-medium mb-2 block">Search</label>
+                    <Input placeholder="Job title, company, or keywords" />
                   </div>
-
-                  <Button
-                    className="w-full"
-                    onClick={() => {
-                      recordActivity("job", 30)
-                        .then(() => {
-                          toast({
-                            title: "Application started",
-                            description: "You've earned 30 points for applying.",
-                          });
-                        })
-                        .catch(() => {
-                          // ignore if user isn't logged in
-                        });
-                      window.open("https://example.com/apply", "_blank");
-                    }}
-                  >
-                    Apply Now <ExternalLink className="h-4 w-4 ml-2" />
-                  </Button>
+                  <div>
+                    <label className="text-sm font-medium mb-2 block">Location</label>
+                    <Input placeholder="City, State, or Remote" />
+                  </div>
+                  <div>
+                    <label className="text-sm font-medium mb-2 block">Job Type</label>
+                    <Select>
+                      <SelectTrigger>
+                        <SelectValue placeholder="All types" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="">All types</SelectItem>
+                        <SelectItem value="Full-time">Full-time</SelectItem>
+                        <SelectItem value="Internship">Internship</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  <div className="flex items-center space-x-2">
+                    <Checkbox id="remote" />
+                    <label htmlFor="remote" className="text-sm font-medium">Remote only</label>
+                  </div>
+                  <Button className="w-full">Apply Filters</Button>
                 </CardContent>
               </Card>
-            ) : (
+            </div>
+
+            <div className="lg:col-span-2">
+              <Tabs defaultValue="jobs" className="w-full">
+                <TabsList className="grid w-full grid-cols-3">
+                  <TabsTrigger value="jobs">Jobs ({filteredJobs.length})</TabsTrigger>
+                  <TabsTrigger value="internships">Internships ({filteredInternships.length})</TabsTrigger>
+                  <TabsTrigger value="assistant">AI Assistant</TabsTrigger>
+                </TabsList>
+
+                <TabsContent value="jobs" className="mt-6">
+                  <div className="space-y-4">
+                    {filteredJobs.length === 0 ? (
+                      <Card className="p-8 text-center">
+                        <Target className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
+                        <h3 className="text-lg font-medium mb-2">No opportunities found yet</h3>
+                        <p className="text-muted-foreground mb-4">
+                          Complete more modules or update your skills to unlock personalized job matches.
+                        </p>
+                        <div className="flex flex-col sm:flex-row gap-3 justify-center">
+                          <Button variant="outline" onClick={() => window.location.href = '/roadmap'}>
+                            Continue Learning
+                          </Button>
+                          <Button variant="outline" onClick={() => window.location.href = '/assessment'}>
+                            Update Skills
+                          </Button>
+                        </div>
+                      </Card>
+                    ) : (
+                      filteredJobs.map((job, index) => {
+                        if (!job || typeof job !== 'object') return null;
+                        return (
+                          <Card
+                            key={job?.id || `job-${index}`}
+                            className="cursor-pointer transition-all hover:shadow-lg"
+                          >
+                            <CardContent className="p-6">
+                              <div className="flex justify-between items-start mb-3">
+                                <div>
+                                  <h3 className="font-bold text-lg mb-1">{job?.title || 'Untitled Position'}</h3>
+                                  <div className="flex items-center gap-2 text-muted-foreground mb-2">
+                                    <Building className="h-4 w-4" />
+                                    <span>{job?.company || 'Company'}</span>
+                                    <MapPin className="h-4 w-4 ml-2" />
+                                    <span>{job?.location || 'Location'}</span>
+                                    {job?.remote && <Badge variant="secondary">Remote</Badge>}
+                                  </div>
+                                </div>
+                                {job?.matchScore && (
+                                  <Badge className="bg-green-100 text-green-800">
+                                    {job.matchScore}% match
+                                  </Badge>
+                                )}
+                              </div>
+
+                              <p className="text-sm text-muted-foreground mb-3 overflow-hidden text-ellipsis">
+                                {job?.description || 'No description available.'}
+                              </p>
+
+                              <div className="flex items-center justify-between">
+                                <div className="flex items-center gap-4 text-sm">
+                                  <div className="flex items-center gap-1">
+                                    <DollarSign className="h-4 w-4" />
+                                    <span>{job?.salary || 'Salary not specified'}</span>
+                                  </div>
+                                  {job?.type && <Badge variant="outline">{job.type}</Badge>}
+                                </div>
+                                <div className="flex items-center gap-1 text-xs text-muted-foreground">
+                                  <Clock className="h-3 w-3" />
+                                  <span>{job?.postedDate || 'Recently posted'}</span>
+                                </div>
+                              </div>
+                            </CardContent>
+                          </Card>
+                        );
+                      }).filter(Boolean)
+                    )}
+                  </div>
+                </TabsContent>
+
+                <TabsContent value="internships" className="mt-6">
+                  <div className="space-y-4">
+                    {filteredInternships.length === 0 ? (
+                      <Card className="p-8 text-center">
+                        <GraduationCap className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
+                        <h3 className="text-lg font-medium mb-2">No internships found yet</h3>
+                        <p className="text-muted-foreground mb-4">
+                          Complete more modules or update your skills to unlock personalized internship matches.
+                        </p>
+                        <div className="flex flex-col sm:flex-row gap-3 justify-center">
+                          <Button variant="outline" onClick={() => window.location.href = '/roadmap'}>
+                            Continue Learning
+                          </Button>
+                          <Button variant="outline" onClick={() => window.location.href = '/assessment'}>
+                            Update Skills
+                          </Button>
+                        </div>
+                      </Card>
+                    ) : (
+                      filteredInternships.map((internship, index) => {
+                        if (!internship || typeof internship !== 'object') return null;
+                        return (
+                          <Card
+                            key={internship?.id || `internship-${index}`}
+                            className="cursor-pointer transition-all hover:shadow-lg"
+                          >
+                            <CardContent className="p-6">
+                              <div className="flex justify-between items-start mb-3">
+                                <div>
+                                  <h3 className="font-bold text-lg mb-1">{internship?.title || 'Untitled Internship'}</h3>
+                                  <div className="flex items-center gap-2 text-muted-foreground mb-2">
+                                    <Building className="h-4 w-4" />
+                                    <span>{internship?.company || 'Company'}</span>
+                                    <MapPin className="h-4 w-4 ml-2" />
+                                    <span>{internship?.location || 'Location'}</span>
+                                    {internship?.remote && <Badge variant="secondary">Remote</Badge>}
+                                  </div>
+                                </div>
+                                {internship?.matchScore && (
+                                  <Badge className="bg-green-100 text-green-800">
+                                    {internship.matchScore}% match
+                                  </Badge>
+                                )}
+                              </div>
+
+                              <p className="text-sm text-muted-foreground mb-3 overflow-hidden text-ellipsis">
+                                {internship?.description || 'No description available.'}
+                              </p>
+
+                              <div className="flex items-center justify-between">
+                                <div className="flex items-center gap-4 text-sm">
+                                  <div className="flex items-center gap-1">
+                                    <DollarSign className="h-4 w-4" />
+                                    <span>{internship?.salary || 'Stipend not specified'}</span>
+                                  </div>
+                                  {internship?.type && <Badge variant="outline">{internship.type}</Badge>}
+                                </div>
+                                <div className="flex items-center gap-1 text-xs text-muted-foreground">
+                                  <Clock className="h-3 w-3" />
+                                  <span>{internship?.postedDate || 'Recently posted'}</span>
+                                </div>
+                              </div>
+                            </CardContent>
+                          </Card>
+                        );
+                      }).filter(Boolean)
+                    )}
+                  </div>
+                </TabsContent>
+
+                <TabsContent value="assistant" className="mt-6">
+                  <Card className="h-[500px] flex flex-col">
+                    <CardHeader>
+                      <CardTitle className="flex items-center gap-2">
+                        <Bot className="h-5 w-5" />
+                        AI Job Assistant
+                      </CardTitle>
+                    </CardHeader>
+                    <CardContent className="flex-1 flex flex-col p-0">
+                      <ScrollArea className="flex-1 p-4">
+                        <div className="space-y-4">
+                          {messages.map((message) => (
+                            <div
+                              key={message.id}
+                              className={`flex ${message.isBot ? 'justify-start' : 'justify-end'}`}
+                            >
+                              <div
+                                className={`max-w-[80%] rounded-lg px-3 py-2 ${
+                                  message.isBot
+                                    ? 'bg-muted text-muted-foreground'
+                                    : 'bg-primary text-primary-foreground'
+                                }`}
+                              >
+                                <p className="text-sm">{message.text}</p>
+                                <p className="text-xs opacity-70 mt-1">
+                                  {message.timestamp.toLocaleTimeString()}
+                                </p>
+                              </div>
+                            </div>
+                          ))}
+                          {isTyping && (
+                            <div className="flex justify-start">
+                              <div className="bg-muted text-muted-foreground rounded-lg px-3 py-2">
+                                <div className="flex items-center gap-1">
+                                  <div className="w-2 h-2 bg-current rounded-full animate-bounce"></div>
+                                  <div className="w-2 h-2 bg-current rounded-full animate-bounce" style={{ animationDelay: '0.1s' }}></div>
+                                  <div className="w-2 h-2 bg-current rounded-full animate-bounce" style={{ animationDelay: '0.2s' }}></div>
+                                </div>
+                              </div>
+                            </div>
+                          )}
+                        </div>
+                      </ScrollArea>
+                      <div className="border-t p-4">
+                        <div className="flex gap-2">
+                          <Input
+                            value={inputMessage}
+                            onChange={(e) => setInputMessage(e.target.value)}
+                            placeholder="Ask me about job search, interviews, resumes..."
+                            onKeyPress={(e) => e.key === 'Enter' && handleSendMessage()}
+                            disabled={isTyping}
+                          />
+                          <Button
+                            onClick={handleSendMessage}
+                            disabled={!inputMessage.trim() || isTyping}
+                            size="icon"
+                          >
+                            <Send className="h-4 w-4" />
+                          </Button>
+                        </div>
+                      </div>
+                    </CardContent>
+                  </Card>
+                </TabsContent>
+              </Tabs>
+            </div>
+
+            <div className="lg:col-span-1">
               <Card className="sticky top-8">
                 <CardContent className="p-6 text-center text-muted-foreground">
                   <p>Select a job to view details</p>
                 </CardContent>
               </Card>
-            )}
+            </div>
           </div>
-        </div>
+        )}
       </div>
     </div>
   );
