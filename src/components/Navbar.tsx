@@ -7,6 +7,7 @@ import { useSupabaseAuth } from "@/hooks/useSupabaseAuth";
 const navLinks = [
   { label: "Features", href: "/#features" },
   { label: "Career Library", href: "/careers" },
+  { label: "Jobs", href: "/jobs-internships" },
   { label: "Leaderboard", href: "/leaderboard" },
 ];
 
@@ -29,8 +30,26 @@ const Navbar = () => {
       className="fixed top-0 left-0 right-0 z-50 bg-[rgba(15,23,42,0.3)] backdrop-blur-[16px] border-b border-[rgba(255,255,255,0.1)]"
     >
       <div className="container mx-auto flex items-center justify-between px-6 py-4">
-        <Link to="/" className="flex items-center">
-          <img src="/learn2hire.png" alt="Learn2Hire" className="h-8 md:h-10 brightness-0 invert" />
+        <Link to="/" className="flex items-center gap-3 group">
+          <motion.div
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
+            className="flex items-center gap-2.5"
+          >
+            <div className="relative flex items-center justify-center">
+              <div className="absolute inset-0 bg-white/10 blur-xl rounded-full group-hover:bg-white/20 transition-all duration-300" />
+              <div className="relative p-2 rounded-xl bg-[rgba(255,255,255,0.05)] backdrop-blur-xl border border-[rgba(255,255,255,0.15)] group-hover:border-[rgba(255,255,255,0.3)] transition-all duration-300">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" className="text-white opacity-90 group-hover:opacity-100 transition-opacity">
+                  <path d="M12 2L2 7L12 12L22 7L12 2Z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                  <path d="M2 17L12 22L22 17" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                  <path d="M2 12L12 17L22 12" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                </svg>
+              </div>
+            </div>
+            <span className="text-2xl font-display font-bold tracking-tight text-white group-hover:brightness-110 transition-all">
+              Learn<span className="text-slate-400">2</span>Hire
+            </span>
+          </motion.div>
         </Link>
 
         <div className="hidden md:flex items-center gap-8">

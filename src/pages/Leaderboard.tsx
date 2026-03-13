@@ -9,6 +9,7 @@ import { Progress } from "@/components/ui/progress";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { getLeaderboard, subscribeLeaderboard, LeaderboardUser } from "@/lib/supabaseLeaderboard";
 import { useSupabaseAuth } from "@/hooks/useSupabaseAuth";
+import BackButton from "@/components/BackButton";
 
 const getRankIcon = (rank: number) => {
   switch (rank) {
@@ -160,6 +161,7 @@ const Leaderboard = () => {
     <div className="min-h-screen animated-gradient-bg">
       <Navbar />
       <div className="container mx-auto px-6 pt-28 pb-16 max-w-6xl">
+        <BackButton />
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}

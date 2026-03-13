@@ -23,6 +23,7 @@ import Auth from "./pages/Auth";
 import ErrorBoundary from "./components/ErrorBoundary";
 import FloatingChatbot from "./components/FloatingChatbot";
 import Portfolio from "./pages/Portfolio";
+import CareerMentor from "./pages/CareerMentor";
 import PresentationMode from "./components/PresentationMode";
 import { useState, useEffect } from "react";
 
@@ -72,6 +73,7 @@ const App = () => {
                 <JobsInternships />
               </ErrorBoundary>
             } />
+            <Route path="/career-mentor" element={<CareerMentor />} />
             <Route path="/portfolio" element={<Portfolio />} />
             <Route path="/auth" element={<Auth />} />
             <Route path="*" element={<NotFound />} />

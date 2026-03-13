@@ -2,6 +2,7 @@ import { useState, useRef } from "react";
 import { motion } from "framer-motion";
 import { Upload, FileText, CheckCircle, AlertCircle } from "lucide-react";
 import Navbar from "@/components/Navbar";
+import BackButton from "@/components/BackButton";
 import Chatbot from "@/components/Chatbot";
 import ResumeForm from "@/components/ResumeForm";
 import ResumePreview from "@/components/ResumePreview";
@@ -136,6 +137,7 @@ const ResumeBuilder = () => {
       <Navbar />
       <section className="pt-32 pb-20 px-6">
         <div className="container mx-auto max-w-7xl">
+          <BackButton />
           <motion.div
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
@@ -251,7 +253,7 @@ const ResumeBuilder = () => {
             {/* AI Chatbot Sidebar */}
             <div className="lg:col-span-1">
               <div className="sticky top-24">
-                <Chatbot onResumeUpdate={setResumeData} />
+                <Chatbot onResumeUpdate={(data) => setResumeData(data as any)} />
               </div>
             </div>
           </div>

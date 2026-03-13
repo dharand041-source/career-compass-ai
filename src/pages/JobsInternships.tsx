@@ -1,416 +1,450 @@
-import { useState, useEffect } from "react";
-import { motion } from "framer-motion";
+import { useState, useRef, useEffect } from "react";
+import { motion, AnimatePresence } from "framer-motion";
+import { 
+  Bot, Send, Loader2, ArrowRight, Briefcase, 
+  Target, GraduationCap, MapPin, Building, 
+  ExternalLink, Sparkles, BookOpen, CheckCircle2,
+  Trash2, Plus, Brain
+} from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Checkbox } from "@/components/ui/checkbox";
-import { MapPin, DollarSign, Clock, Building, ExternalLink, Bot, Send, Loader2, AlertCircle, Target, GraduationCap } from "lucide-react";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { recordActivity } from "@/lib/supabaseLeaderboard";
-import { useToast } from "@/components/ui/use-toast";
-import { fetchJobsForUser, searchJobs, Job, getUserProfile, updateUserProgress } from "@/lib/jobService";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Progress } from "@/components/ui/progress";
+import Navbar from "@/components/Navbar";
+import { careers } from "@/data/careers";
+import { getUserProfile, Job, fetchJobsForUser } from "@/lib/jobService";
+import { Link, useNavigate } from "react-router-dom";
+import BackButton from "@/components/BackButton";
 
 interface Message {
   id: string;
   text: string;
   isBot: boolean;
   timestamp: Date;
+  type?: "text" | "recommendation" | "input_request";
+  recommendations?: Job[];
+  suggestedCourses?: any[];
+}
+
+interface UserDetails {
+  field: string;
+  skills: string[];
+  role: string;
+  experience: string;
+  location: string;
 }
 
 const JobsInternships = () => {
-  const { toast } = useToast();
-  const [jobs, setJobs] = useState<Job[]>([]);
-  const [internships, setInternships] = useState<Job[]>([]);
-  const [filteredJobs, setFilteredJobs] = useState<Job[]>([]);
-  const [filteredInternships, setFilteredInternships] = useState<Job[]>([]);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
   const [messages, setMessages] = useState<Message[]>([
     {
-      id: '1',
-      text: "Hi! I'm your AI job assistant. I can help you with job search strategies, resume tips, interview preparation, and more. What would you like to know?",
+      id: "1",
+      text: "Hello! I'm your AI Career Assistant. To help you find the best job matches, I'll need to know a bit about your career goals and skills. Shall we start?",
       isBot: true,
-      timestamp: new Date()
+      timestamp: new Date(),
+      type: "text"
     }
   ]);
-  const [inputMessage, setInputMessage] = useState('');
+  const [input, setInput] = useState("");
   const [isTyping, setIsTyping] = useState(false);
+  const [step, setStep] = useState(0);
+  const [userDetails, setUserDetails] = useState<UserDetails>({
+    field: "",
+    skills: [],
+    role: "",
+    experience: "",
+    location: ""
+  });
+  const [matches, setMatches] = useState<Job[]>([]);
+  const [suggestedRoadmap, setSuggestedRoadmap] = useState<any[]>([]);
+  const scrollRef = useRef<HTMLDivElement>(null);
 
-  const loadJobs = async () => {
-    try {
-      setLoading(true);
-      setError(null);
-      console.log('Fetching jobs for user...');
-      const fetchedJobs = await fetchJobsForUser();
-      console.log('Fetched jobs:', fetchedJobs);
-      
-      if (!Array.isArray(fetchedJobs)) {
-        throw new Error('Invalid response: expected array of jobs');
-      }
-      
-      // Separate jobs and internships
-      const jobsOnly = fetchedJobs.filter(job => job && job.type !== 'Internship');
-      const internshipsOnly = fetchedJobs.filter(job => job && job.type === 'Internship');
-      
-      setJobs(jobsOnly);
-      setInternships(internshipsOnly);
-      setFilteredJobs(jobsOnly);
-      setFilteredInternships(internshipsOnly);
-    } catch (err) {
-      console.error('Error fetching jobs:', err);
-      setError(err instanceof Error ? err.message : 'Failed to load jobs. Please try again.');
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  // Fetch jobs on component mount
   useEffect(() => {
-    console.log('JobsInternships component mounted');
-    loadJobs();
-  }, []);
+    if (scrollRef.current) {
+      scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
+    }
+  }, [messages, isTyping]);
 
-  const handleSendMessage = async () => {
-    if (!inputMessage.trim()) return;
-
-    const userMessage: Message = {
+  const addMessage = (msg: Omit<Message, "id" | "timestamp">) => {
+    const newMsg = {
+      ...msg,
       id: Date.now().toString(),
-      text: inputMessage,
-      isBot: false,
       timestamp: new Date()
     };
+    setMessages(prev => [...prev, newMsg]);
+  };
 
-    setMessages(prev => [...prev, userMessage]);
-    setInputMessage('');
+  const handleSend = async () => {
+    if (!input.trim()) return;
+
+    const userText = input.trim();
+    addMessage({ text: userText, isBot: false });
+    setInput("");
     setIsTyping(true);
 
-    // Simulate AI response
-    setTimeout(() => {
-      const responses = [
-        "That's a great question! Based on your profile, I'd recommend focusing on roles that match your current skill level.",
-        "I can help you prepare for interviews. Would you like some common questions and tips?",
-        "Networking is key in job hunting. Consider reaching out to professionals in your target companies.",
-        "Your resume looks strong! Make sure to tailor it for each application by highlighting relevant experience.",
-        "Practice makes perfect! Try mock interviews to build confidence before applying to positions."
-      ];
+    // AI Logic Flow
+    setTimeout(async () => {
+      let botResponse = "";
+      let nextStep = step;
 
-      const botMessage: Message = {
-        id: (Date.now() + 1).toString(),
-        text: responses[Math.floor(Math.random() * responses.length)],
-        isBot: true,
-        timestamp: new Date()
-      };
+      if (step === 0) {
+        botResponse = "Great! First, what is your primary career field? (e.g., Software Development, Data Science, UI/UX Design)";
+        nextStep = 1;
+      } else if (step === 1) {
+        setUserDetails(prev => ({ ...prev, field: userText }));
+        botResponse = `Excellent. For ${userText}, what technical skills do you currently have? (List them separated by commas, e.g., React, Python, SQL)`;
+        nextStep = 2;
+      } else if (step === 2) {
+        const skills = userText.split(",").map(s => s.trim());
+        setUserDetails(prev => ({ ...prev, skills }));
+        botResponse = "What is your preferred job role? (e.g., Frontend Developer, Data Analyst, Product Manager)";
+        nextStep = 3;
+      } else if (step === 3) {
+        setUserDetails(prev => ({ ...prev, role: userText }));
+        botResponse = "What is your experience level? (Fresher, Student, or Experienced)";
+        nextStep = 4;
+      } else if (step === 4) {
+        setUserDetails(prev => ({ ...prev, experience: userText }));
+        botResponse = "And finally, what is your preferred job location? (e.g., Remote, San Francisco, Bangalore)";
+        nextStep = 5;
+      } else if (step === 5) {
+        setUserDetails(prev => ({ ...prev, location: userText }));
+        botResponse = "Analyzing your profile and matching with current market opportunities...";
+        
+        // Generate Matches
+        const allJobs = await fetchJobsForUser();
+        const userSkills = userDetails.skills;
+        
+        const scoredMatches = allJobs.map(job => {
+          const matchedSkills = job.requirements.filter(req => 
+            userSkills.some(s => s.toLowerCase().includes(req.toLowerCase()) || req.toLowerCase().includes(s.toLowerCase()))
+          );
+          const matchScore = Math.round((matchedSkills.length / Math.max(job.requirements.length, 1)) * 100);
+          return { ...job, matchScore };
+        }).sort((a, b) => b.matchScore - a.matchScore);
 
-      setMessages(prev => [...prev, botMessage]);
+        setMatches(scoredMatches);
+        
+        // Find Skill Gaps
+        const bestMatch = scoredMatches[0];
+        const gaps = bestMatch.requirements.filter(req => 
+          !userSkills.some(s => s.toLowerCase().includes(req.toLowerCase()) || req.toLowerCase().includes(s.toLowerCase()))
+        );
+
+        const careerData = careers.find(c => c.title.toLowerCase().includes(userDetails.field.toLowerCase()) || userDetails.field.toLowerCase().includes(c.title.toLowerCase()));
+        
+        addMessage({ 
+          text: `I've found ${scoredMatches.length} job opportunities that match your profile! Here are the best ones for you.`, 
+          isBot: true,
+          type: "recommendation",
+          recommendations: scoredMatches.slice(0, 3)
+        });
+
+        if (gaps.length > 0) {
+          addMessage({
+            text: `I noticed you're missing some skills for top-tier roles: ${gaps.join(", ")}. I recommend checking out these modules to boost your profile:`,
+            isBot: true,
+            type: "text"
+          });
+          
+          if (careerData) {
+            setSuggestedRoadmap(careerData.skills.filter(s => gaps.includes(s)).map(s => ({ name: s, careerId: careerData.id })));
+          }
+        }
+
+        botResponse = "You can view all your matches in the 'Opportunities' tab. I'll continue to update these as you learn new skills!";
+        nextStep = 6;
+      } else {
+        botResponse = "I'm here to help! Do you want to refine your search or ask about a specific role?";
+      }
+
+      setStep(nextStep);
       setIsTyping(false);
-    }, 1000);
+      if (botResponse) addMessage({ text: botResponse, isBot: true });
+    }, 1500);
   };
 
   return (
     <div className="min-h-screen animated-gradient-bg">
-      <div className="container mx-auto max-w-7xl px-6 py-32">
-        <motion.div
-          initial={{ opacity: 0, y: 30 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.7 }}
-          className="text-center mb-12"
-        >
-          <h1 className="text-4xl sm:text-5xl font-display font-bold mb-6">
-            Jobs & Internships
-          </h1>
-          <p className="text-lg text-muted-foreground mb-8">
-            Matched opportunities based on your skills and career path.
-          </p>
-        </motion.div>
-
-        {loading ? (
-          <div className="flex flex-col items-center justify-center py-12">
-            <Loader2 className="h-8 w-8 animate-spin text-primary mb-4" />
-            <p className="text-muted-foreground">Finding the perfect matches for you...</p>
-          </div>
-        ) : error ? (
-          <Card className="p-6">
-            <div className="flex items-center gap-3 text-destructive">
-              <AlertCircle className="h-5 w-5" />
-              <div>
-                <h3 className="font-medium">Unable to load jobs</h3>
-                <p className="text-sm text-muted-foreground mt-1">{error}</p>
-              </div>
-            </div>
-            <Button
-              onClick={loadJobs}
-              className="mt-4"
-              variant="outline"
-            >
-              Try Again
-            </Button>
-          </Card>
-        ) : (
-          <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
-            {/* Filters Sidebar */}
-            <div className="lg:col-span-1">
-              <Card className="sticky top-8">
-                <CardHeader>
-                  <CardTitle>Filters</CardTitle>
-                </CardHeader>
-                <CardContent className="space-y-4">
-                  <div>
-                    <label className="text-sm font-medium mb-2 block">Search</label>
-                    <Input placeholder="Job title, company, or keywords" />
+      <Navbar />
+      <div className="container mx-auto max-w-7xl px-6 pt-32 pb-12">
+        <BackButton />
+        <div className="flex flex-col lg:flex-row gap-8 h-[calc(100vh-180px)]">
+          {/* AI Assistant Chat Section */}
+          <div className="lg:w-1/3 flex flex-col gap-4">
+            <Card className="flex-1 flex flex-col glass border-white/10 overflow-hidden">
+              <CardHeader className="border-b border-white/5 bg-white/5 py-4">
+                <CardTitle className="text-lg flex items-center gap-2">
+                  <div className="p-2 rounded-lg bg-cyan-500/20">
+                    <Bot className="h-5 w-5 text-cyan-400" />
                   </div>
-                  <div>
-                    <label className="text-sm font-medium mb-2 block">Location</label>
-                    <Input placeholder="City, State, or Remote" />
-                  </div>
-                  <div>
-                    <label className="text-sm font-medium mb-2 block">Job Type</label>
-                    <Select>
-                      <SelectTrigger>
-                        <SelectValue placeholder="All types" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="">All types</SelectItem>
-                        <SelectItem value="Full-time">Full-time</SelectItem>
-                        <SelectItem value="Internship">Internship</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </div>
-                  <div className="flex items-center space-x-2">
-                    <Checkbox id="remote" />
-                    <label htmlFor="remote" className="text-sm font-medium">Remote only</label>
-                  </div>
-                  <Button className="w-full">Apply Filters</Button>
-                </CardContent>
-              </Card>
-            </div>
-
-            <div className="lg:col-span-2">
-              <Tabs defaultValue="jobs" className="w-full">
-                <TabsList className="grid w-full grid-cols-3">
-                  <TabsTrigger value="jobs">Jobs ({filteredJobs.length})</TabsTrigger>
-                  <TabsTrigger value="internships">Internships ({filteredInternships.length})</TabsTrigger>
-                  <TabsTrigger value="assistant">AI Assistant</TabsTrigger>
-                </TabsList>
-
-                <TabsContent value="jobs" className="mt-6">
-                  <div className="space-y-4">
-                    {filteredJobs.length === 0 ? (
-                      <Card className="p-8 text-center">
-                        <Target className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
-                        <h3 className="text-lg font-medium mb-2">No opportunities found yet</h3>
-                        <p className="text-muted-foreground mb-4">
-                          Complete more modules or update your skills to unlock personalized job matches.
-                        </p>
-                        <div className="flex flex-col sm:flex-row gap-3 justify-center">
-                          <Button variant="outline" onClick={() => window.location.href = '/roadmap'}>
-                            Continue Learning
-                          </Button>
-                          <Button variant="outline" onClick={() => window.location.href = '/assessment'}>
-                            Update Skills
-                          </Button>
-                        </div>
-                      </Card>
-                    ) : (
-                      filteredJobs.map((job, index) => {
-                        if (!job || typeof job !== 'object') return null;
-                        return (
-                          <Card
-                            key={job?.id || `job-${index}`}
-                            className="cursor-pointer transition-all hover:shadow-lg"
-                          >
-                            <CardContent className="p-6">
-                              <div className="flex justify-between items-start mb-3">
-                                <div>
-                                  <h3 className="font-bold text-lg mb-1">{job?.title || 'Untitled Position'}</h3>
-                                  <div className="flex items-center gap-2 text-muted-foreground mb-2">
-                                    <Building className="h-4 w-4" />
-                                    <span>{job?.company || 'Company'}</span>
-                                    <MapPin className="h-4 w-4 ml-2" />
-                                    <span>{job?.location || 'Location'}</span>
-                                    {job?.remote && <Badge variant="secondary">Remote</Badge>}
+                  AI Career Assistant
+                </CardTitle>
+                <CardDescription>Intelligent Job Matching & Guidance</CardDescription>
+              </CardHeader>
+              <CardContent className="flex-1 overflow-hidden p-0 relative">
+                <ScrollArea className="h-full p-4" ref={scrollRef}>
+                  <div className="space-y-4 pb-4">
+                    {messages.map((m) => (
+                      <motion.div
+                        key={m.id}
+                        initial={{ opacity: 0, y: 10 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        className={`flex ${m.isBot ? "justify-start" : "justify-end"}`}
+                      >
+                        <div className={`max-w-[85%] p-4 rounded-2xl ${
+                          m.isBot 
+                            ? "bg-slate-800/80 border border-white/5 text-slate-100 rounded-tl-none" 
+                            : "bg-cyan-600 text-white rounded-tr-none"
+                        }`}>
+                          <p className="text-sm leading-relaxed">{m.text}</p>
+                          
+                          {m.recommendations && (
+                            <div className="mt-4 space-y-3">
+                              {m.recommendations.map((job, idx) => (
+                                <div key={idx} className="bg-black/20 p-3 rounded-xl border border-white/5">
+                                  <div className="flex justify-between items-start mb-1">
+                                    <h4 className="font-bold text-xs">{job.title}</h4>
+                                    <Badge className="text-[10px] h-4 bg-green-500/20 text-green-400 border-none">
+                                      {job.matchScore}% Match
+                                    </Badge>
                                   </div>
+                                  <p className="text-[10px] text-slate-400 mb-2">{job.company}</p>
+                                  <Button size="sm" className="w-full h-7 text-[10px] bg-cyan-500 hover:bg-cyan-600">
+                                    View Role
+                                  </Button>
                                 </div>
-                                {job?.matchScore && (
-                                  <Badge className="bg-green-100 text-green-800">
-                                    {job.matchScore}% match
-                                  </Badge>
-                                )}
-                              </div>
-
-                              <p className="text-sm text-muted-foreground mb-3 overflow-hidden text-ellipsis">
-                                {job?.description || 'No description available.'}
-                              </p>
-
-                              <div className="flex items-center justify-between">
-                                <div className="flex items-center gap-4 text-sm">
-                                  <div className="flex items-center gap-1">
-                                    <DollarSign className="h-4 w-4" />
-                                    <span>{job?.salary || 'Salary not specified'}</span>
-                                  </div>
-                                  {job?.type && <Badge variant="outline">{job.type}</Badge>}
-                                </div>
-                                <div className="flex items-center gap-1 text-xs text-muted-foreground">
-                                  <Clock className="h-3 w-3" />
-                                  <span>{job?.postedDate || 'Recently posted'}</span>
-                                </div>
-                              </div>
-                            </CardContent>
-                          </Card>
-                        );
-                      }).filter(Boolean)
-                    )}
-                  </div>
-                </TabsContent>
-
-                <TabsContent value="internships" className="mt-6">
-                  <div className="space-y-4">
-                    {filteredInternships.length === 0 ? (
-                      <Card className="p-8 text-center">
-                        <GraduationCap className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
-                        <h3 className="text-lg font-medium mb-2">No internships found yet</h3>
-                        <p className="text-muted-foreground mb-4">
-                          Complete more modules or update your skills to unlock personalized internship matches.
-                        </p>
-                        <div className="flex flex-col sm:flex-row gap-3 justify-center">
-                          <Button variant="outline" onClick={() => window.location.href = '/roadmap'}>
-                            Continue Learning
-                          </Button>
-                          <Button variant="outline" onClick={() => window.location.href = '/assessment'}>
-                            Update Skills
-                          </Button>
-                        </div>
-                      </Card>
-                    ) : (
-                      filteredInternships.map((internship, index) => {
-                        if (!internship || typeof internship !== 'object') return null;
-                        return (
-                          <Card
-                            key={internship?.id || `internship-${index}`}
-                            className="cursor-pointer transition-all hover:shadow-lg"
-                          >
-                            <CardContent className="p-6">
-                              <div className="flex justify-between items-start mb-3">
-                                <div>
-                                  <h3 className="font-bold text-lg mb-1">{internship?.title || 'Untitled Internship'}</h3>
-                                  <div className="flex items-center gap-2 text-muted-foreground mb-2">
-                                    <Building className="h-4 w-4" />
-                                    <span>{internship?.company || 'Company'}</span>
-                                    <MapPin className="h-4 w-4 ml-2" />
-                                    <span>{internship?.location || 'Location'}</span>
-                                    {internship?.remote && <Badge variant="secondary">Remote</Badge>}
-                                  </div>
-                                </div>
-                                {internship?.matchScore && (
-                                  <Badge className="bg-green-100 text-green-800">
-                                    {internship.matchScore}% match
-                                  </Badge>
-                                )}
-                              </div>
-
-                              <p className="text-sm text-muted-foreground mb-3 overflow-hidden text-ellipsis">
-                                {internship?.description || 'No description available.'}
-                              </p>
-
-                              <div className="flex items-center justify-between">
-                                <div className="flex items-center gap-4 text-sm">
-                                  <div className="flex items-center gap-1">
-                                    <DollarSign className="h-4 w-4" />
-                                    <span>{internship?.salary || 'Stipend not specified'}</span>
-                                  </div>
-                                  {internship?.type && <Badge variant="outline">{internship.type}</Badge>}
-                                </div>
-                                <div className="flex items-center gap-1 text-xs text-muted-foreground">
-                                  <Clock className="h-3 w-3" />
-                                  <span>{internship?.postedDate || 'Recently posted'}</span>
-                                </div>
-                              </div>
-                            </CardContent>
-                          </Card>
-                        );
-                      }).filter(Boolean)
-                    )}
-                  </div>
-                </TabsContent>
-
-                <TabsContent value="assistant" className="mt-6">
-                  <Card className="h-[500px] flex flex-col">
-                    <CardHeader>
-                      <CardTitle className="flex items-center gap-2">
-                        <Bot className="h-5 w-5" />
-                        AI Job Assistant
-                      </CardTitle>
-                    </CardHeader>
-                    <CardContent className="flex-1 flex flex-col p-0">
-                      <ScrollArea className="flex-1 p-4">
-                        <div className="space-y-4">
-                          {messages.map((message) => (
-                            <div
-                              key={message.id}
-                              className={`flex ${message.isBot ? 'justify-start' : 'justify-end'}`}
-                            >
-                              <div
-                                className={`max-w-[80%] rounded-lg px-3 py-2 ${
-                                  message.isBot
-                                    ? 'bg-muted text-muted-foreground'
-                                    : 'bg-primary text-primary-foreground'
-                                }`}
-                              >
-                                <p className="text-sm">{message.text}</p>
-                                <p className="text-xs opacity-70 mt-1">
-                                  {message.timestamp.toLocaleTimeString()}
-                                </p>
-                              </div>
-                            </div>
-                          ))}
-                          {isTyping && (
-                            <div className="flex justify-start">
-                              <div className="bg-muted text-muted-foreground rounded-lg px-3 py-2">
-                                <div className="flex items-center gap-1">
-                                  <div className="w-2 h-2 bg-current rounded-full animate-bounce"></div>
-                                  <div className="w-2 h-2 bg-current rounded-full animate-bounce" style={{ animationDelay: '0.1s' }}></div>
-                                  <div className="w-2 h-2 bg-current rounded-full animate-bounce" style={{ animationDelay: '0.2s' }}></div>
-                                </div>
-                              </div>
+                              ))}
                             </div>
                           )}
+                          
+                          <span className="text-[10px] opacity-40 mt-2 block">
+                            {m.timestamp.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                          </span>
                         </div>
-                      </ScrollArea>
-                      <div className="border-t p-4">
-                        <div className="flex gap-2">
-                          <Input
-                            value={inputMessage}
-                            onChange={(e) => setInputMessage(e.target.value)}
-                            placeholder="Ask me about job search, interviews, resumes..."
-                            onKeyPress={(e) => e.key === 'Enter' && handleSendMessage()}
-                            disabled={isTyping}
-                          />
-                          <Button
-                            onClick={handleSendMessage}
-                            disabled={!inputMessage.trim() || isTyping}
-                            size="icon"
-                          >
-                            <Send className="h-4 w-4" />
-                          </Button>
+                      </motion.div>
+                    ))}
+                    {isTyping && (
+                      <div className="flex justify-start">
+                        <div className="bg-slate-800/80 p-3 rounded-2xl rounded-tl-none border border-white/5">
+                          <div className="flex gap-1">
+                            <span className="w-1.5 h-1.5 bg-cyan-400 rounded-full animate-bounce" />
+                            <span className="w-1.5 h-1.5 bg-cyan-400 rounded-full animate-bounce [animation-delay:0.2s]" />
+                            <span className="w-1.5 h-1.5 bg-cyan-400 rounded-full animate-bounce [animation-delay:0.4s]" />
+                          </div>
                         </div>
                       </div>
-                    </CardContent>
-                  </Card>
-                </TabsContent>
-              </Tabs>
-            </div>
-
-            <div className="lg:col-span-1">
-              <Card className="sticky top-8">
-                <CardContent className="p-6 text-center text-muted-foreground">
-                  <p>Select a job to view details</p>
-                </CardContent>
-              </Card>
-            </div>
+                    )}
+                  </div>
+                </ScrollArea>
+              </CardContent>
+              <CardFooter className="p-4 border-t border-white/5 bg-black/20">
+                <div className="flex gap-2 w-full">
+                  <Input 
+                    placeholder="Type your response..." 
+                    className="bg-slate-900/50 border-white/10 text-white"
+                    value={input}
+                    onChange={(e) => setInput(e.target.value)}
+                    onKeyDown={(e) => e.key === "Enter" && handleSend()}
+                    disabled={isTyping}
+                  />
+                  <Button size="icon" className="bg-cyan-500 hover:bg-cyan-600 shrink-0" onClick={handleSend} disabled={isTyping}>
+                    <Send className="h-4 w-4" />
+                  </Button>
+                </div>
+              </CardFooter>
+            </Card>
           </div>
-        )}
+
+          {/* Jobs & Roadmap Content Section */}
+          <div className="lg:w-2/3 flex flex-col gap-6">
+            <Tabs defaultValue="matches" className="w-full h-full flex flex-col">
+              <div className="flex items-center justify-between mb-2">
+                <TabsList className="bg-slate-800/50 border border-white/5">
+                  <TabsTrigger value="matches" className="data-[state=active]:bg-cyan-600">
+                    <Target className="h-4 w-4 mr-2" />
+                    Top Matches ({matches.length})
+                  </TabsTrigger>
+                  <TabsTrigger value="roadmap" className="data-[state=active]:bg-purple-600">
+                    <Brain className="h-4 w-4 mr-2" />
+                    Skill Roadmap
+                  </TabsTrigger>
+                </TabsList>
+                
+                {userDetails.field && (
+                  <div className="hidden md:flex items-center gap-2">
+                    <Badge variant="outline" className="bg-cyan-500/10 text-cyan-400 border-cyan-500/20">
+                      {userDetails.field}
+                    </Badge>
+                    <Badge variant="outline" className="bg-purple-500/10 text-purple-400 border-purple-500/20">
+                      {userDetails.experience}
+                    </Badge>
+                  </div>
+                )}
+              </div>
+
+              <div className="flex-1 overflow-hidden">
+                <TabsContent value="matches" className="h-full m-0">
+                  {matches.length === 0 ? (
+                    <div className="h-full flex flex-col items-center justify-center glass border-white/10 rounded-2xl p-12 text-center">
+                      <div className="w-20 h-20 rounded-full bg-slate-800 flex items-center justify-center mb-6">
+                        <Briefcase className="h-10 w-10 text-slate-600" />
+                      </div>
+                      <h3 className="text-xl font-bold mb-2 text-white">No active matches found</h3>
+                      <p className="text-slate-400 max-w-sm">Complete the AI Assistant's assessment to see personalized job and internship opportunities.</p>
+                    </div>
+                  ) : (
+                    <ScrollArea className="h-full pr-4">
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pb-4">
+                        {matches.map((job) => (
+                          <motion.div
+                            key={job.id}
+                            whileHover={{ y: -5 }}
+                            className="group"
+                          >
+                            <Card className="glass border-white/10 hover:border-cyan-500/30 transition-all duration-300">
+                              <CardHeader className="pb-2">
+                                <div className="flex justify-between items-start">
+                                  <div>
+                                    <Badge className="mb-2 bg-cyan-500/20 text-cyan-400 hover:bg-cyan-500/20 border-none px-2 py-0 text-[10px]">
+                                      {job.type}
+                                    </Badge>
+                                    <CardTitle className="text-lg text-white group-hover:text-cyan-400 transition-colors">
+                                      {job.title}
+                                    </CardTitle>
+                                    <div className="flex items-center gap-2 text-slate-400 text-sm mt-1">
+                                      <Building className="h-3.5 w-3.5" />
+                                      {job.company}
+                                    </div>
+                                  </div>
+                                  <div className="text-right">
+                                    <div className="text-xl font-bold text-green-400">{job.matchScore}%</div>
+                                    <div className="text-[10px] text-slate-500 uppercase font-bold tracking-wider">Match</div>
+                                  </div>
+                                </div>
+                              </CardHeader>
+                              <CardContent>
+                                <div className="flex items-center gap-4 text-xs text-slate-300 mb-4 bg-white/5 p-2 rounded-lg">
+                                  <div className="flex items-center gap-1">
+                                    <MapPin className="h-3.5 w-3.5 text-cyan-400" />
+                                    {job.location}
+                                  </div>
+                                  <div className="flex items-center gap-1">
+                                    <Sparkles className="h-3.5 w-3.5 text-yellow-400" />
+                                    {job.salary}
+                                  </div>
+                                </div>
+                                <div className="space-y-2">
+                                  <p className="text-xs text-slate-400 line-clamp-2 leading-relaxed">
+                                    {job.description}
+                                  </p>
+                                  <div className="flex flex-wrap gap-2 pt-2">
+                                    {job.requirements.slice(0, 3).map((req, i) => (
+                                      <Badge key={i} variant="secondary" className="bg-slate-800 text-[10px] border-white/5">
+                                        {req}
+                                      </Badge>
+                                    ))}
+                                    {job.requirements.length > 3 && (
+                                      <span className="text-[10px] text-slate-500">+{job.requirements.length - 3} more</span>
+                                    )}
+                                  </div>
+                                </div>
+                              </CardContent>
+                              <CardFooter className="pt-0">
+                                <Button className="w-full bg-slate-800 hover:bg-cyan-600 text-white border border-white/10 group-hover:border-cyan-500/50">
+                                  Apply Now <ExternalLink className="h-3.5 w-3.5 ml-2" />
+                                </Button>
+                              </CardFooter>
+                            </Card>
+                          </motion.div>
+                        ))}
+                      </div>
+                    </ScrollArea>
+                  )}
+                </TabsContent>
+
+                <TabsContent value="roadmap" className="h-full m-0">
+                  <div className="h-full glass border-white/10 rounded-2xl p-8 overflow-y-auto">
+                    <div className="flex items-center gap-4 mb-8">
+                      <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-purple-500 to-indigo-600 flex items-center justify-center shadow-lg shadow-purple-500/20">
+                        <GraduationCap className="h-8 w-8 text-white" />
+                      </div>
+                      <div>
+                        <h3 className="text-2xl font-bold text-white">Personalized Upskilling</h3>
+                        <p className="text-slate-400">Targeted modules to unlock your top matches</p>
+                      </div>
+                    </div>
+
+                    {suggestedRoadmap.length === 0 ? (
+                      <div className="text-center py-12">
+                        <div className="w-16 h-16 rounded-full bg-slate-800 flex items-center justify-center mb-4 mx-auto">
+                          <Brain className="h-8 w-8 text-slate-600" />
+                        </div>
+                        <p className="text-slate-400">Complete the assistant's flow to see your recommended learning path.</p>
+                      </div>
+                    ) : (
+                      <div className="space-y-6">
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                          {suggestedRoadmap.map((skill, idx) => (
+                            <motion.div
+                              key={idx}
+                              initial={{ opacity: 0, scale: 0.95 }}
+                              animate={{ opacity: 1, scale: 1 }}
+                              transition={{ delay: idx * 0.1 }}
+                            >
+                              <div className="bg-slate-800/50 border border-white/5 rounded-2xl p-5 hover:border-purple-500/30 transition-all group">
+                                <div className="flex justify-between items-start mb-4">
+                                  <Badge className="bg-purple-500/20 text-purple-400 border-none">
+                                    Required Skill
+                                  </Badge>
+                                  <div className="flex -space-x-2">
+                                    {[1, 2, 3].map(i => (
+                                      <div key={i} className="w-6 h-6 rounded-full border border-slate-900 bg-slate-700 overflow-hidden">
+                                        <img src={`https://api.dicebear.com/7.x/avataaars/svg?seed=${skill.name}${i}`} alt="user" />
+                                      </div>
+                                    ))}
+                                  </div>
+                                </div>
+                                <h4 className="text-lg font-bold text-white mb-2">{skill.name} Masterclass</h4>
+                                <div className="flex items-center gap-4 text-xs text-slate-400 mb-6">
+                                  <div className="flex items-center gap-1">
+                                    <BookOpen className="h-3.5 w-3.5 text-purple-400" />
+                                    12 Lessons
+                                  </div>
+                                  <div className="flex items-center gap-1 text-yellow-400">
+                                    <Sparkles className="h-3.5 w-3.5 fill-current" />
+                                    Premium Content
+                                  </div>
+                                </div>
+                                <Link to={`/roadmap/${skill.careerId}`}>
+                                  <Button className="w-full bg-purple-600 hover:bg-purple-700 text-white font-bold group-hover:shadow-[0_0_15px_rgba(168,85,247,0.4)]">
+                                    Start Learning <ArrowRight className="h-4 w-4 ml-2 group-hover:translate-x-1 transition-transform" />
+                                  </Button>
+                                </Link>
+                              </div>
+                            </motion.div>
+                          ))}
+                        </div>
+                        
+                        <div className="bg-gradient-to-r from-cyan-500/10 to-purple-500/10 border border-white/10 rounded-2xl p-6 mt-8">
+                          <div className="flex items-center gap-3 mb-2">
+                            <CheckCircle2 className="h-5 w-5 text-green-400" />
+                            <h4 className="font-bold text-white">AI Career Insight</h4>
+                          </div>
+                          <p className="text-sm text-slate-300 leading-relaxed">
+                            Completing these {suggestedRoadmap.length} modules will increase your match score for "{userDetails.role}" roles by an average of 18%, unlocking approximately 50+ new opportunities in your region.
+                          </p>
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                </TabsContent>
+              </div>
+            </Tabs>
+          </div>
+        </div>
       </div>
     </div>
   );

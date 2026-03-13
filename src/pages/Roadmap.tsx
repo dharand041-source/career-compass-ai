@@ -1,6 +1,7 @@
-import { useParams, useLocation, Link } from "react-router-dom";
+import { useParams, useLocation, Link, useNavigate } from "react-router-dom";
+import BackButton from "@/components/BackButton";
 import { motion, AnimatePresence } from "framer-motion";
-import { CheckCircle2, Circle, Play, ArrowRight, Award, BookOpen, X, Check, Laptop, Lock } from "lucide-react";
+import { CheckCircle2, Circle, Play, ArrowRight, Award, BookOpen, X, Check, Laptop, Lock, ArrowLeft } from "lucide-react";
 import { useState, useEffect, useRef } from "react";
 import { careers } from "@/data/careers";
 import GlassCard from "@/components/GlassCard";
@@ -175,6 +176,7 @@ const Roadmap = () => {
     <div className="min-h-screen animated-gradient-bg">
       <Navbar />
       <div className="container mx-auto px-6 pt-28 pb-16 max-w-4xl">
+        <BackButton />
         <GlassCard glow className="mb-8 text-center relative overflow-hidden">
           {allModulesCompleted && (
             <div className="absolute top-4 right-4 flex flex-col items-center animate-bounce-subtle">
@@ -304,8 +306,12 @@ const Roadmap = () => {
 
             {activeLesson && activeModule && (
               <div className="mt-2 flex flex-col items-center">
-                <Button variant="ghost" className="self-start mb-4" onClick={() => setActiveLesson(null)}>
-                  ← Back to Lessons
+                <Button 
+                  variant="ghost" 
+                  className="self-start mb-4 text-slate-400 hover:text-white hover:bg-white/5" 
+                  onClick={() => setActiveLesson(null)}
+                >
+                  <ArrowLeft className="h-4 w-4 mr-2" /> Back to Lessons
                 </Button>
                 
                 <div className="w-full aspect-video bg-black rounded-xl overflow-hidden shadow-2xl mb-6 relative">

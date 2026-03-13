@@ -5,6 +5,7 @@ import { interviewQuestions } from "@/data/careers";
 import GlowButton from "@/components/GlowButton";
 import AnimatedProgress from "@/components/AnimatedProgress";
 import Navbar from "@/components/Navbar";
+import BackButton from "@/components/BackButton";
 
 const Interview = () => {
   const navigate = useNavigate();
@@ -55,6 +56,7 @@ const Interview = () => {
       <div className="min-h-screen animated-gradient-bg">
         <Navbar />
         <div className="container mx-auto px-6 pt-28 pb-16 max-w-2xl text-center">
+          <BackButton className="mb-4" />
           <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="glass p-10">
             <h1 className="font-display text-3xl font-bold mb-4">Interview Practice</h1>
             <p className="text-muted-foreground mb-3">20 questions: 15 MCQs + 5 fill-in-the-blank</p>

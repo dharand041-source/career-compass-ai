@@ -6,6 +6,8 @@ import { Progress } from "@/components/ui/progress";
 import { Badge } from "@/components/ui/badge";
 import { useToast } from "@/components/ui/use-toast";
 import { recordActivity } from "@/lib/supabaseLeaderboard";
+import Navbar from "@/components/Navbar";
+import BackButton from "@/components/BackButton";
 
 interface Question {
   id: string;
@@ -189,7 +191,9 @@ const CareerAssessment = () => {
   if (showResults && results) {
     return (
       <div className="min-h-screen animated-gradient-bg">
-        <div className="container mx-auto max-w-4xl px-6 py-32">
+        <Navbar />
+        <div className="container mx-auto max-w-4xl px-6 pt-32 pb-12">
+          <BackButton />
           <motion.div
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
@@ -276,7 +280,9 @@ const CareerAssessment = () => {
 
   return (
     <div className="min-h-screen animated-gradient-bg">
-      <div className="container mx-auto max-w-4xl px-6 py-32">
+      <Navbar />
+      <div className="container mx-auto max-w-4xl px-6 pt-32 pb-12">
+        <BackButton />
         <motion.div
           initial={{ opacity: 0, y: 30 }}
           animate={{ opacity: 1, y: 0 }}

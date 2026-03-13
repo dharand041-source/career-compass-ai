@@ -11,7 +11,7 @@ const features = [
   { icon: Briefcase, title: "Smart Job Matching", desc: "AI-matched opportunities based on your skills and career path.", route: "/jobs-internships", color: "text-red-400" },
   { icon: Trophy, title: "Gamification & Leaderboard", desc: "Earn points, track streaks, and compete with peers.", route: "/leaderboard", color: "text-yellow-400" },
   { icon: Users, title: "Project Portfolio", desc: "Showcase your projects and skills professionally.", route: "/portfolio", color: "text-indigo-400" },
-  { icon: Sparkles, title: "AI Career Mentor", desc: "24/7 intelligent chatbot for career guidance.", route: "#", color: "text-pink-400" },
+  { icon: Sparkles, title: "AI Career Mentor", desc: "24/7 intelligent chatbot for career guidance.", route: "/career-mentor", color: "text-pink-400" },
 ];
 
 const Landing = () => {
@@ -339,7 +339,9 @@ const Landing = () => {
       {/* Footer */}
       <footer className="border-t border-[rgba(255,255,255,0.05)] py-8 px-6 relative z-10 bg-[rgba(15,23,42,0.4)] backdrop-blur-sm">
         <div className="container mx-auto flex flex-col sm:flex-row items-center justify-between text-sm text-slate-400 font-medium">
-          <span className="font-display font-semibold text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-purple-400">Learn2Hire</span>
+          <span className="font-display font-bold text-white tracking-tight">
+            Learn<span className="text-slate-400">2</span>Hire
+          </span>
           <span>© 2026 Learn2Hire. All rights reserved.</span>
         </div>
       </footer>

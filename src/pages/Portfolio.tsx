@@ -11,6 +11,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from 
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
+import BackButton from "@/components/BackButton";
 
 interface Project {
   id: string;
@@ -162,6 +163,7 @@ const Portfolio = () => {
     <div className="min-h-screen animated-gradient-bg">
       <Navbar />
       <div className="container mx-auto px-6 pt-28 pb-16 max-w-7xl">
+        <BackButton />
         <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}>
           <div className="flex items-center justify-between mb-2">
             <h1 className="font-display text-3xl font-bold">Project Portfolio</h1>

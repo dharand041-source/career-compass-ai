@@ -1,6 +1,6 @@
 import { useLocation, Link } from "react-router-dom";
 import { motion } from "framer-motion";
-import { BookOpen, FileText, Briefcase, Trophy, Target, TrendingUp, Award, Flame, Star, Calendar, Zap, Users } from "lucide-react";
+import { BookOpen, FileText, Briefcase, Trophy, Target, TrendingUp, Award, Flame, Star, Calendar, Zap, Users, Sparkles } from "lucide-react";
 import GlassCard from "@/components/GlassCard";
 import AnimatedProgress from "@/components/AnimatedProgress";
 import GlowButton from "@/components/GlowButton";
@@ -196,7 +196,7 @@ const Dashboard = () => {
                 <GlowButton variant="secondary" size="sm" className="w-full">Continue Learning</GlowButton>
               </Link>
               <Link to="/video-learning">
-                <GlowButton variant="outline" size="sm">Watch Videos</GlowButton>
+                <GlowButton variant="secondary" size="sm">Watch Videos</GlowButton>
               </Link>
             </div>
           </GlassCard>
@@ -210,14 +210,14 @@ const Dashboard = () => {
                 <GlowButton variant="secondary" size="sm" className="w-full">Improve Resume</GlowButton>
               </Link>
               <Link to="/resume-builder">
-                <GlowButton variant="outline" size="sm">AI Builder</GlowButton>
+                <GlowButton variant="secondary" size="sm">AI Builder</GlowButton>
               </Link>
             </div>
           </GlassCard>
         </div>
 
         {/* Quick actions */}
-        <div className="grid grid-cols-1 sm:grid-cols-4 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-6 gap-4">
           <Link to="/interview">
             <GlassCard className="text-center cursor-pointer p-6">
               <BookOpen className="h-8 w-8 text-primary mx-auto mb-2" />
@@ -225,7 +225,14 @@ const Dashboard = () => {
               <p className="text-xs text-muted-foreground mt-1">Practice questions</p>
             </GlassCard>
           </Link>
-          <Link to="/jobs">
+          <Link to="/career-mentor">
+            <GlassCard className="text-center cursor-pointer p-6" delay={0.05}>
+              <Sparkles className="h-8 w-8 text-cyan-400 mx-auto mb-2" />
+              <p className="font-display font-semibold text-sm">AI Mentor</p>
+              <p className="text-xs text-muted-foreground mt-1">Career guidance</p>
+            </GlassCard>
+          </Link>
+          <Link to="/jobs-internships">
             <GlassCard className="text-center cursor-pointer p-6" delay={0.1}>
               <Briefcase className="h-8 w-8 text-accent mx-auto mb-2" />
               <p className="font-display font-semibold text-sm">Browse Jobs</p>
@@ -237,6 +244,13 @@ const Dashboard = () => {
               <Trophy className="h-8 w-8 text-primary mx-auto mb-2" />
               <p className="font-display font-semibold text-sm">Leaderboard</p>
               <p className="text-xs text-muted-foreground mt-1">Compete with peers</p>
+            </GlassCard>
+          </Link>
+          <Link to="/portfolio">
+            <GlassCard className="text-center cursor-pointer p-6" delay={0.25}>
+              <Users className="h-8 w-8 text-cyan-400 mx-auto mb-2" />
+              <p className="font-display font-semibold text-sm">Portfolio</p>
+              <p className="text-xs text-muted-foreground mt-1">Showcase work</p>
             </GlassCard>
           </Link>
           <Link to="/careers">

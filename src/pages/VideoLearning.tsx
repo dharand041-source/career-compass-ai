@@ -9,6 +9,20 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { recordActivity } from "@/lib/supabaseLeaderboard";
 import { useToast } from "@/components/ui/use-toast";
 import { seedCourses } from "@/lib/seedCourses";
+import Navbar from "@/components/Navbar";
+import BackButton from "@/components/BackButton";
+import { useSupabaseAuth } from "@/hooks/useSupabaseAuth";
+import { 
+  getCourses, 
+  getUserCourseProgress, 
+  getCourseLessons, 
+  getUserLessonProgress, 
+  enrollInCourse as enrollUserInCourse, 
+  updateLessonProgress, 
+  subscribeCourseProgress,
+  Course,
+  CourseLesson
+} from "@/lib/supabaseCourses";
 
 interface Video {
   id: string;
@@ -34,14 +48,6 @@ const VideoLearning = () => {
   const [loading, setLoading] = useState(true);
   const [overallProgress, setOverallProgress] = useState(0);
   const { toast } = useToast();
-
-  useEffect(() => {
-    if (user) {
-      loadCourses();
-    } else {
-      setLoading(false);
-    }
-  }, [user, loadCourses]);
 
   const loadCourses = useCallback(async () => {
     if (!user) return;
@@ -74,7 +80,6 @@ const VideoLearning = () => {
 
       setCourses(coursesWithProgress);
 
-      // Calculate overall progress
       const totalProgress = coursesWithProgress
         .filter(c => c.enrolled)
         .reduce((sum, course) => sum + course.progress, 0);
@@ -87,6 +92,14 @@ const VideoLearning = () => {
       setLoading(false);
     }
   }, [user]);
+
+  useEffect(() => {
+    if (user) {
+      loadCourses();
+    } else {
+      setLoading(false);
+    }
+  }, [user, loadCourses]);
 
   useEffect(() => {
     if (!user) return;
@@ -161,15 +174,10 @@ const VideoLearning = () => {
   if (currentVideo) {
     return (
       <div className="min-h-screen animated-gradient-bg">
-        <div className="container mx-auto max-w-7xl px-6 py-8">
+        <Navbar />
+        <div className="container mx-auto max-w-7xl px-6 pt-32 pb-12">
+          <BackButton className="mb-4" />
           <div className="mb-6">
-            <Button
-              onClick={() => setCurrentVideo(null)}
-              variant="outline"
-              className="mb-4"
-            >
-              ← Back to Course
-            </Button>
             <h1 className="text-2xl font-bold mb-2">{currentVideo.title}</h1>
           </div>
 
@@ -274,14 +282,9 @@ const VideoLearning = () => {
   if (selectedCourse) {
     return (
       <div className="min-h-screen animated-gradient-bg">
-        <div className="container mx-auto max-w-6xl px-6 py-8">
-          <Button
-            onClick={() => setSelectedCourse(null)}
-            variant="outline"
-            className="mb-6"
-          >
-            ← Back to Courses
-          </Button>
+        <Navbar />
+        <div className="container mx-auto max-w-6xl px-6 pt-32 pb-12">
+          <BackButton className="mb-4" />
 
           <div className="mb-8">
             <div className="flex items-start justify-between mb-4">
@@ -375,7 +378,9 @@ const VideoLearning = () => {
 
   return (
     <div className="min-h-screen animated-gradient-bg">
-      <div className="container mx-auto max-w-6xl px-6 py-32">
+      <Navbar />
+      <div className="container mx-auto max-w-6xl px-6 pt-32 pb-12">
+        <BackButton />
         <motion.div
           initial={{ opacity: 0, y: 30 }}
           animate={{ opacity: 1, y: 0 }}

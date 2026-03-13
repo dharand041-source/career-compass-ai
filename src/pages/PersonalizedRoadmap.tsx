@@ -7,6 +7,8 @@ import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 import { ChevronDown, ChevronRight, CheckCircle, Clock, BookOpen, Code, Users } from "lucide-react";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
+import Navbar from "@/components/Navbar";
+import BackButton from "@/components/BackButton";
 
 interface RoadmapItem {
   id: string;
@@ -245,7 +247,9 @@ const PersonalizedRoadmap = () => {
 
   return (
     <div className="min-h-screen animated-gradient-bg">
-      <div className="container mx-auto max-w-6xl px-6 py-32">
+      <Navbar />
+      <div className="container mx-auto max-w-6xl px-6 pt-32 pb-12">
+        <BackButton />
         <motion.div
           initial={{ opacity: 0, y: 30 }}
           animate={{ opacity: 1, y: 0 }}
