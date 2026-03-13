@@ -6,9 +6,14 @@ import AnimatedProgress from "@/components/AnimatedProgress";
 import GlowButton from "@/components/GlowButton";
 import Navbar from "@/components/Navbar";
 
+interface DashboardState {
+  interviewScore?: number;
+  interviewTotal?: number;
+}
+
 const Dashboard = () => {
   const location = useLocation();
-  const { interviewScore = 14, interviewTotal = 20 } = (location.state as any) || {};
+  const { interviewScore = 14, interviewTotal = 20 } = (location.state as DashboardState) || {};
 
   const stats = [
     { icon: Target, label: "Career Path", value: "Software Dev", color: "text-primary" },

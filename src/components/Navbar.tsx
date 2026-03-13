@@ -3,6 +3,7 @@ import { motion } from "framer-motion";
 import { Sparkles, Menu, X } from "lucide-react";
 import { useState } from "react";
 import GlowButton from "./GlowButton";
+import { useSupabaseAuth } from "@/hooks/useSupabaseAuth";
 
 const navLinks = [
   { label: "Features", href: "/#features" },
@@ -13,6 +14,7 @@ const navLinks = [
 const Navbar = () => {
   const [open, setOpen] = useState(false);
   const location = useLocation();
+  const { user, signOut } = useSupabaseAuth();
   const isLanding = location.pathname === "/";
 
   return (
@@ -40,18 +42,30 @@ const Navbar = () => {
         </div>
 
         <div className="hidden md:flex items-center gap-3">
-          {isLanding ? (
+          {user ? (
             <>
+              <span className="text-sm text-muted-foreground">Hi, {user.email?.split("@")[0]}</span>
               <Link to="/dashboard">
-                <GlowButton variant="secondary" size="sm">Log in</GlowButton>
+                <GlowButton size="sm">Dashboard</GlowButton>
               </Link>
-              <Link to="/career-select">
+              <GlowButton size="sm" variant="secondary" onClick={() => signOut()}>
+                Sign out
+              </GlowButton>
+            </>
+          ) : isLanding ? (
+            <>
+              <Link to="/auth">
+                <GlowButton variant="secondary" size="sm">
+                  Log in
+                </GlowButton>
+              </Link>
+              <Link to="/auth">
                 <GlowButton size="sm">Get Started</GlowButton>
               </Link>
             </>
           ) : (
-            <Link to="/dashboard">
-              <GlowButton size="sm">Dashboard</GlowButton>
+            <Link to="/auth">
+              <GlowButton size="sm">Log in</GlowButton>
             </Link>
           )}
         </div>
@@ -68,9 +82,32 @@ const Navbar = () => {
               {l.label}
             </Link>
           ))}
-          <Link to="/career-select" onClick={() => setOpen(false)}>
-            <GlowButton size="sm" className="w-full mt-2">Get Started</GlowButton>
-          </Link>
+          {user ? (
+            <>
+              <Link to="/dashboard" onClick={() => setOpen(false)}>
+                <GlowButton size="sm" className="w-full mt-2">
+                  Dashboard
+                </GlowButton>
+              </Link>
+              <GlowButton
+                onClick={() => {
+                  signOut();
+                  setOpen(false);
+                }}
+                variant="secondary"
+                size="sm"
+                className="w-full mt-2"
+              >
+                Sign out
+              </GlowButton>
+            </>
+          ) : (
+            <Link to="/auth" onClick={() => setOpen(false)}>
+              <GlowButton size="sm" className="w-full mt-2">
+                Get Started
+              </GlowButton>
+            </Link>
+          )}
         </motion.div>
       )}
     </motion.nav>

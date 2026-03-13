@@ -14,6 +14,12 @@ import Jobs from "./pages/Jobs";
 import Leaderboard from "./pages/Leaderboard";
 import Careers from "./pages/Careers";
 import NotFound from "./pages/NotFound";
+import CareerAssessment from "./pages/CareerAssessment";
+import PersonalizedRoadmap from "./pages/PersonalizedRoadmap";
+import VideoLearning from "./pages/VideoLearning";
+import ResumeBuilder from "./pages/ResumeBuilder";
+import JobsInternships from "./pages/JobsInternships";
+import Auth from "./pages/Auth";
 
 const queryClient = new QueryClient();
 
@@ -34,6 +40,12 @@ const App = () => (
           <Route path="/jobs" element={<Jobs />} />
           <Route path="/leaderboard" element={<Leaderboard />} />
           <Route path="/careers" element={<Careers />} />
+          <Route path="/career-assessment" element={<CareerAssessment />} />
+          <Route path="/personalized-roadmap" element={<PersonalizedRoadmap />} />
+          <Route path="/video-learning" element={<VideoLearning />} />
+          <Route path="/resume-builder" element={<ResumeBuilder />} />
+          <Route path="/jobs-internships" element={<JobsInternships />} />
+          <Route path="/auth" element={<Auth />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
       </BrowserRouter>

@@ -14,7 +14,184 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      users: {
+        Row: {
+          id: string;
+          username: string;
+          email: string | null;
+          points: number;
+          streak: number;
+          longest_streak: number;
+          assessments_completed: number;
+          videos_watched: number;
+          resumes_created: number;
+          jobs_applied: number;
+          last_active: string | null;
+          created_at: string;
+          updated_at: string;
+        };
+        Insert: {
+          id?: string;
+          username: string;
+          email?: string | null;
+          points?: number;
+          streak?: number;
+          longest_streak?: number;
+          assessments_completed?: number;
+          videos_watched?: number;
+          resumes_created?: number;
+          jobs_applied?: number;
+          last_active?: string | null;
+          created_at?: string;
+          updated_at?: string;
+        };
+        Update: {
+          id?: string;
+          username?: string;
+          email?: string | null;
+          points?: number;
+          streak?: number;
+          longest_streak?: number;
+          assessments_completed?: number;
+          videos_watched?: number;
+          resumes_created?: number;
+          jobs_applied?: number;
+          last_active?: string | null;
+          created_at?: string;
+          updated_at?: string;
+        };
+      };
+      courses: {
+        Row: {
+          id: string;
+          title: string;
+          instructor: string;
+          total_videos: number;
+          total_duration: number; // in seconds
+          level: "Beginner" | "Intermediate" | "Advanced";
+          rating: number;
+          students: number;
+          created_at: string;
+        };
+        Insert: {
+          id?: string;
+          title: string;
+          instructor: string;
+          total_videos: number;
+          total_duration: number;
+          level: "Beginner" | "Intermediate" | "Advanced";
+          rating?: number;
+          students?: number;
+          created_at?: string;
+        };
+        Update: {
+          id?: string;
+          title?: string;
+          instructor?: string;
+          total_videos?: number;
+          total_duration?: number;
+          level?: "Beginner" | "Intermediate" | "Advanced";
+          rating?: number;
+          students?: number;
+          created_at?: string;
+        };
+      };
+      course_lessons: {
+        Row: {
+          id: string;
+          course_id: string;
+          title: string;
+          youtube_id: string;
+          duration: number; // in seconds
+          order_index: number;
+          created_at: string;
+        };
+        Insert: {
+          id?: string;
+          course_id: string;
+          title: string;
+          youtube_id: string;
+          duration: number;
+          order_index: number;
+          created_at?: string;
+        };
+        Update: {
+          id?: string;
+          course_id?: string;
+          title?: string;
+          youtube_id?: string;
+          duration?: number;
+          order_index?: number;
+          created_at?: string;
+        };
+      };
+      user_course_progress: {
+        Row: {
+          id: string;
+          user_id: string;
+          course_id: string;
+          enrolled_at: string;
+          progress_percentage: number;
+          completed_lessons: number;
+          total_watched_duration: number;
+          updated_at: string;
+        };
+        Insert: {
+          id?: string;
+          user_id: string;
+          course_id: string;
+          enrolled_at?: string;
+          progress_percentage?: number;
+          completed_lessons?: number;
+          total_watched_duration?: number;
+          updated_at?: string;
+        };
+        Update: {
+          id?: string;
+          user_id?: string;
+          course_id?: string;
+          enrolled_at?: string;
+          progress_percentage?: number;
+          completed_lessons?: number;
+          total_watched_duration?: number;
+          updated_at?: string;
+        };
+      };
+      user_lesson_progress: {
+        Row: {
+          id: string;
+          user_id: string;
+          lesson_id: string;
+          started: boolean;
+          watched_duration: number; // in seconds
+          completed: boolean;
+          quiz_score?: number | null;
+          last_watched_at: string;
+          updated_at: string;
+        };
+        Insert: {
+          id?: string;
+          user_id: string;
+          lesson_id: string;
+          started?: boolean;
+          watched_duration?: number;
+          completed?: boolean;
+          quiz_score?: number | null;
+          last_watched_at?: string;
+          updated_at?: string;
+        };
+        Update: {
+          id?: string;
+          user_id?: string;
+          lesson_id?: string;
+          started?: boolean;
+          watched_duration?: number;
+          completed?: boolean;
+          quiz_score?: number | null;
+          last_watched_at?: string;
+          updated_at?: string;
+        };
+      };
     }
     Views: {
       [_ in never]: never

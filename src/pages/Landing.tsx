@@ -6,12 +6,12 @@ import GlowButton from "@/components/GlowButton";
 import Navbar from "@/components/Navbar";
 
 const features = [
-  { icon: Brain, title: "AI Career Assessment", desc: "Smart questions that evaluate your skills and find knowledge gaps." },
-  { icon: Target, title: "Personalized Roadmap", desc: "Get a custom learning path with the exact skills you need." },
-  { icon: BookOpen, title: "Video Learning Modules", desc: "Curated YouTube tutorials organized into structured courses." },
-  { icon: FileText, title: "AI Resume Builder", desc: "Create and analyze resumes with AI-powered scoring." },
-  { icon: Briefcase, title: "Jobs & Internships", desc: "Matched opportunities based on your skills and career path." },
-  { icon: Trophy, title: "Leaderboard & Gamification", desc: "Earn points, track streaks, and compete with peers." },
+  { icon: Brain, title: "AI Career Assessment", desc: "Smart questions that evaluate your skills and find knowledge gaps.", route: "/career-assessment" },
+  { icon: Target, title: "Personalized Roadmap", desc: "Get a custom learning path with the exact skills you need.", route: "/personalized-roadmap" },
+  { icon: BookOpen, title: "Video Learning Modules", desc: "Curated YouTube tutorials organized into structured courses.", route: "/video-learning" },
+  { icon: FileText, title: "AI Resume Builder", desc: "Create and analyze resumes with AI-powered scoring.", route: "/resume-builder" },
+  { icon: Briefcase, title: "Jobs & Internships", desc: "Matched opportunities based on your skills and career path.", route: "/jobs-internships" },
+  { icon: Trophy, title: "Leaderboard & Gamification", desc: "Earn points, track streaks, and compete with peers.", route: "/leaderboard" },
 ];
 
 const Landing = () => {
@@ -66,11 +66,13 @@ const Landing = () => {
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {features.map((f, i) => (
-              <GlassCard key={f.title} delay={i * 0.1}>
-                <f.icon className="h-10 w-10 text-primary mb-4" />
-                <h3 className="font-display text-lg font-semibold mb-2">{f.title}</h3>
-                <p className="text-sm text-muted-foreground">{f.desc}</p>
-              </GlassCard>
+              <Link key={f.title} to={f.route} className="block">
+                <GlassCard delay={i * 0.1}>
+                  <f.icon className="h-10 w-10 text-primary mb-4" />
+                  <h3 className="font-display text-lg font-semibold mb-2">{f.title}</h3>
+                  <p className="text-sm text-muted-foreground">{f.desc}</p>
+                </GlassCard>
+              </Link>
             ))}
           </div>
         </div>
