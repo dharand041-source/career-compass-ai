@@ -225,10 +225,10 @@ const PersonalizedRoadmap = () => {
 
   const getDifficultyColor = (difficulty: string) => {
     switch (difficulty) {
-      case "Beginner": return "bg-green-100 text-green-800";
-      case "Intermediate": return "bg-yellow-100 text-yellow-800";
-      case "Advanced": return "bg-red-100 text-red-800";
-      default: return "bg-gray-100 text-gray-800";
+      case "Beginner": return "bg-green-500/20 text-green-300 border border-green-500/30 shadow-[0_0_10px_rgba(34,197,94,0.2)]";
+      case "Intermediate": return "bg-yellow-500/20 text-yellow-300 border border-yellow-500/30 shadow-[0_0_10px_rgba(234,179,8,0.2)]";
+      case "Advanced": return "bg-red-500/20 text-red-300 border border-red-500/30 shadow-[0_0_10px_rgba(239,68,68,0.2)]";
+      default: return "bg-slate-500/20 text-slate-300 border border-slate-500/30";
     }
   };
 
@@ -311,16 +311,16 @@ const PersonalizedRoadmap = () => {
                 <Card key={phase.id}>
                   <Collapsible open={phase.isOpen} onOpenChange={() => togglePhase(phase.id)}>
                     <CollapsibleTrigger asChild>
-                      <CardHeader className="cursor-pointer hover:bg-gray-50 transition-colors">
+                      <CardHeader className="cursor-pointer hover:bg-[rgba(255,255,255,0.05)] transition-all duration-300 border-b border-[rgba(255,255,255,0.05)]">
                         <div className="flex items-center justify-between">
                           <div className="flex items-center gap-3">
-                            {phase.isOpen ? <ChevronDown className="h-5 w-5" /> : <ChevronRight className="h-5 w-5" />}
+                            {phase.isOpen ? <ChevronDown className="h-5 w-5 text-cyan-400" /> : <ChevronRight className="h-5 w-5 text-slate-400" />}
                             <div>
-                              <CardTitle className="text-xl">{phase.title}</CardTitle>
-                              <p className="text-sm text-muted-foreground mt-1">{phase.description}</p>
+                              <CardTitle className="text-xl text-white">{phase.title}</CardTitle>
+                              <p className="text-sm text-slate-400 mt-1">{phase.description}</p>
                             </div>
                           </div>
-                          <Badge variant="outline">
+                          <Badge variant="outline" className="border-cyan-500/30 text-cyan-300 bg-cyan-500/10">
                             {phase.items.filter(item => item.completed).length}/{phase.items.length} completed
                           </Badge>
                         </div>
@@ -332,27 +332,27 @@ const PersonalizedRoadmap = () => {
                           {phase.items.map((item, itemIndex) => (
                             <div
                               key={item.id}
-                              className={`p-4 rounded-lg border transition-all ${
-                                item.completed ? 'bg-green-50 border-green-200' : 'bg-white border-gray-200'
+                              className={`p-4 rounded-xl border transition-all duration-300 ${
+                                item.completed ? 'bg-green-500/10 border-green-500/30 shadow-[0_0_15px_rgba(34,197,94,0.1)]' : 'bg-[rgba(255,255,255,0.02)] border-[rgba(255,255,255,0.1)] hover:bg-[rgba(255,255,255,0.05)] hover:border-[rgba(255,255,255,0.2)]'
                               }`}
                             >
                               <div className="flex items-start justify-between mb-3">
                                 <div className="flex items-start gap-3">
                                   <button
                                     onClick={() => toggleItemCompletion(phase.id, item.id)}
-                                    className={`mt-1 w-5 h-5 rounded border-2 flex items-center justify-center transition-colors ${
+                                    className={`mt-1 w-5 h-5 rounded border-2 flex items-center justify-center transition-all duration-300 ${
                                       item.completed
-                                        ? 'bg-green-500 border-green-500'
-                                        : 'border-gray-300 hover:border-primary'
+                                        ? 'bg-green-500 border-green-500 shadow-[0_0_10px_rgba(34,197,94,0.5)]'
+                                        : 'bg-[rgba(255,255,255,0.05)] border-[rgba(255,255,255,0.3)] hover:border-cyan-400 hover:shadow-[0_0_10px_rgba(6,182,212,0.3)]'
                                     }`}
                                   >
                                     {item.completed && <CheckCircle className="h-3 w-3 text-white" />}
                                   </button>
                                   <div>
-                                    <h4 className={`font-semibold ${item.completed ? 'line-through text-gray-500' : ''}`}>
+                                    <h4 className={`font-semibold ${item.completed ? 'line-through text-slate-500' : 'text-slate-100'}`}>
                                       {item.title}
                                     </h4>
-                                    <p className="text-sm text-muted-foreground mt-1">{item.description}</p>
+                                    <p className="text-sm text-slate-400 mt-1">{item.description}</p>
                                   </div>
                                 </div>
                                 <div className="flex flex-col items-end gap-2">

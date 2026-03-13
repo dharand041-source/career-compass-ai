@@ -3,8 +3,6 @@ import { motion, AnimatePresence } from "framer-motion";
 import { MessageCircle, Send, X, Bot, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { ScrollArea } from "@/components/ui/scroll-area";
 import { Badge } from "@/components/ui/badge";
 
 interface Message {
@@ -30,9 +28,12 @@ const FloatingChatbot = () => {
 
   useEffect(() => {
     if (scrollRef.current) {
-      scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
+      scrollRef.current.scrollTo({
+        top: scrollRef.current.scrollHeight,
+        behavior: "smooth",
+      });
     }
-  }, [messages]);
+  }, [messages, isTyping]);
 
   // Suggested questions
   const suggestedQuestions = [
@@ -215,7 +216,7 @@ const FloatingChatbot = () => {
         <Button
           onClick={() => setIsOpen(!isOpen)}
           size="lg"
-          className="rounded-full w-14 h-14 shadow-lg hover:shadow-xl transition-shadow"
+          className="rounded-full w-14 h-14 shadow-2xl hover:shadow-[0_0_20px_rgba(var(--primary),0.3)] hover:-translate-y-1 transition-all duration-300"
         >
           <AnimatePresence mode="wait">
             {isOpen ? (
@@ -247,118 +248,158 @@ const FloatingChatbot = () => {
       <AnimatePresence>
         {isOpen && (
           <motion.div
-            className="fixed bottom-24 right-6 z-40"
-            initial={{ opacity: 0, scale: 0.8, y: 20 }}
+            className="fixed bottom-24 right-6 z-40 w-[340px] sm:w-[400px] h-[600px] max-h-[80vh]"
+            initial={{ opacity: 0, scale: 0.9, y: 20, originX: 1, originY: 1 }}
             animate={{ opacity: 1, scale: 1, y: 0 }}
-            exit={{ opacity: 0, scale: 0.8, y: 20 }}
+            exit={{ opacity: 0, scale: 0.9, y: 20 }}
             transition={{ type: "spring", stiffness: 300, damping: 30 }}
           >
-            <Card className="w-80 sm:w-96 h-[500px] flex flex-col shadow-2xl">
-              <CardHeader className="pb-3">
-                <CardTitle className="flex items-center gap-2 text-lg">
-                  <Bot className="h-5 w-5 text-primary" />
+            <div className="w-full h-full flex flex-col shadow-2xl rounded-2xl bg-background/95 backdrop-blur-xl border border-white/10 overflow-hidden ring-1 ring-white/5">
+              
+              {/* Header */}
+              <div className="flex-none p-4 5 border-b border-border/50 bg-card/60 flex items-center shadow-sm">
+                <h3 className="flex items-center gap-2.5 text-lg font-bold font-display tracking-wide">
+                  <div className="bg-primary/10 p-2 rounded-xl text-primary">
+                    <Bot className="h-5 w-5" />
+                  </div>
                   AI Career Assistant
-                </CardTitle>
-              </CardHeader>
+                </h3>
+              </div>
 
-              <CardContent className="flex-1 flex flex-col p-0">
-                <ScrollArea className="flex-1 p-4" ref={scrollRef}>
-                  <div className="space-y-4">
+              {/* Scrollable Messages Section */}
+              <div 
+                ref={scrollRef}
+                className="flex-1 overflow-y-auto p-5 scroll-smooth
+                           [&::-webkit-scrollbar]:w-1.5 
+                           [&::-webkit-scrollbar-track]:bg-transparent 
+                           [&::-webkit-scrollbar-thumb]:bg-muted-foreground/20 
+                           [&::-webkit-scrollbar-thumb]:rounded-full 
+                           hover:[&::-webkit-scrollbar-thumb]:bg-muted-foreground/40"
+              >
+                <div className="space-y-4">
+                  <AnimatePresence initial={false}>
                     {messages.map((message) => (
-                      <div
+                      <motion.div
                         key={message.id}
+                        initial={{ opacity: 0, y: 15 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ duration: 0.3 }}
                         className={`flex ${message.isBot ? "justify-start" : "justify-end"}`}
                       >
                         <div
-                          className={`max-w-[80%] rounded-lg px-3 py-2 text-sm ${
+                          className={`max-w-[85%] px-4 py-3 text-[15px] shadow-sm leading-relaxed ${
                             message.isBot
-                              ? "bg-muted text-muted-foreground"
-                              : "bg-primary text-primary-foreground"
+                              ? "bg-secondary/60 text-secondary-foreground rounded-2xl rounded-tl-sm border border-border/40"
+                              : "bg-primary text-primary-foreground rounded-2xl rounded-tr-sm bg-gradient-to-br from-primary to-primary/90"
                           }`}
                         >
                           <p className="whitespace-pre-wrap">{message.text}</p>
-                          <p className="text-xs opacity-70 mt-1">
+                          <p className="text-[10px] opacity-60 mt-2 font-medium">
                             {message.timestamp.toLocaleTimeString([], {
                               hour: "2-digit",
                               minute: "2-digit",
                             })}
                           </p>
                         </div>
-                      </div>
+                      </motion.div>
                     ))}
+                  </AnimatePresence>
 
-                    {isTyping && (
-                      <div className="flex justify-start">
-                        <div className="bg-muted text-muted-foreground rounded-lg px-3 py-2">
-                          <div className="flex items-center gap-1">
-                            <div className="w-2 h-2 bg-current rounded-full animate-bounce"></div>
-                            <div className="w-2 h-2 bg-current rounded-full animate-bounce" style={{ animationDelay: "0.1s" }}></div>
-                            <div className="w-2 h-2 bg-current rounded-full animate-bounce" style={{ animationDelay: "0.2s" }}></div>
-                          </div>
+                  {/* Typing Indicator */}
+                  {isTyping && (
+                    <motion.div
+                      initial={{ opacity: 0, y: 10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      className="flex justify-start"
+                    >
+                      <div className="bg-secondary/60 text-secondary-foreground rounded-2xl rounded-tl-sm px-5 py-4 shadow-sm border border-border/40">
+                        <div className="flex items-center gap-1.5 h-3">
+                          <motion.div 
+                            className="w-2 h-2 bg-current rounded-full"
+                            animate={{ y: [0, -5, 0] }}
+                            transition={{ duration: 0.6, repeat: Infinity, ease: "easeInOut", delay: 0 }}
+                          />
+                          <motion.div 
+                            className="w-2 h-2 bg-current rounded-full opacity-80"
+                            animate={{ y: [0, -5, 0] }}
+                            transition={{ duration: 0.6, repeat: Infinity, ease: "easeInOut", delay: 0.15 }}
+                          />
+                          <motion.div 
+                            className="w-2 h-2 bg-current rounded-full opacity-60"
+                            animate={{ y: [0, -5, 0] }}
+                            transition={{ duration: 0.6, repeat: Infinity, ease: "easeInOut", delay: 0.3 }}
+                          />
                         </div>
                       </div>
-                    )}
-                  </div>
-                </ScrollArea>
+                    </motion.div>
+                  )}
+                </div>
 
-                {/* Suggested Questions */}
+                {/* Suggested Questions Section */}
                 {messages.length === 1 && (
-                  <div className="p-4 border-t">
-                    <p className="text-xs text-muted-foreground mb-3">Quick actions:</p>
-                    <div className="grid grid-cols-2 gap-2 mb-3">
+                  <motion.div 
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    transition={{ delay: 0.4 }}
+                    className="mt-8 mb-2"
+                  >
+                    <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-3 ml-1">Quick actions</p>
+                    <div className="grid grid-cols-2 gap-2 mb-6">
                       {quickActions.map((action) => (
                         <button
                           key={action.action}
                           onClick={() => handleSuggestedQuestion(action.action)}
-                          className="flex items-center gap-2 p-2 text-xs bg-secondary/50 hover:bg-secondary rounded-lg transition-colors"
+                          className="group flex flex-col sm:flex-row items-center sm:justify-start gap-2.5 p-3 text-xs bg-background hover:bg-primary hover:text-primary-foreground border border-border/50 hover:border-transparent rounded-xl transition-all duration-300 hover:shadow-lg hover:-translate-y-0.5"
                         >
-                          <span>{action.icon}</span>
-                          <span>{action.label}</span>
+                          <span className="text-lg group-hover:scale-110 transition-transform duration-300">{action.icon}</span>
+                          <span className="font-semibold">{action.label}</span>
                         </button>
                       ))}
                     </div>
-                    <p className="text-xs text-muted-foreground mb-2">Or ask me:</p>
-                    <div className="flex flex-wrap gap-1">
+                    <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-3 ml-1">Or ask me</p>
+                    <div className="flex flex-wrap gap-2">
                       {suggestedQuestions.slice(0, 4).map((question, index) => (
                         <Badge
                           key={index}
                           variant="secondary"
-                          className="cursor-pointer hover:bg-secondary/80 text-xs"
+                          className="cursor-pointer bg-secondary/50 hover:bg-primary hover:text-primary-foreground text-xs py-2 px-3.5 rounded-full hover:shadow-md transition-all duration-300 hover:scale-105 border border-border/30 hover:border-transparent font-medium"
                           onClick={() => handleSuggestedQuestion(question)}
                         >
                           {question}
                         </Badge>
                       ))}
                     </div>
-                  </div>
+                  </motion.div>
                 )}
+              </div>
 
-                {/* Input Area */}
-                <div className="border-t p-4">
-                  <div className="flex gap-2">
-                    <Input
-                      value={input}
-                      onChange={(e) => setInput(e.target.value)}
-                      placeholder="Ask me anything about your career..."
-                      onKeyPress={handleKeyPress}
-                      disabled={isTyping}
-                      className="flex-1"
-                    />
-                    <Button
-                      onClick={handleSendMessage}
-                      disabled={!input.trim() || isTyping}
-                      size="icon"
-                    >
-                      {isTyping ? (
-                        <Loader2 className="h-4 w-4 animate-spin" />
-                      ) : (
-                        <Send className="h-4 w-4" />
-                      )}
-                    </Button>
-                  </div>
+              {/* Fixed Bottom Input Area */}
+              <div className="flex-none border-t border-border/50 bg-card/60 p-4">
+                <div className="flex gap-2.5 items-center relative">
+                  <Input
+                    value={input}
+                    onChange={(e) => setInput(e.target.value)}
+                    placeholder="Ask me anything..."
+                    onKeyPress={handleKeyPress}
+                    disabled={isTyping}
+                    className="flex-1 rounded-full h-11 bg-background/80 border-border/50 focus-visible:ring-primary/30 pl-4 pr-12 shadow-sm"
+                  />
+                  <Button
+                    onClick={handleSendMessage}
+                    disabled={!input.trim() || isTyping}
+                    size="icon"
+                    className="absolute right-1 w-9 h-9 rounded-full shadow-sm transition-transform hover:scale-105 group"
+                  >
+                    {isTyping ? (
+                      <Loader2 className="h-4 w-4 animate-spin" />
+                    ) : (
+                      <Send className="h-4 w-4 ml-0.5 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform" />
+                    )}
+                  </Button>
                 </div>
-              </CardContent>
-            </Card>
+              </div>
+
+            </div>
           </motion.div>
         )}
       </AnimatePresence>

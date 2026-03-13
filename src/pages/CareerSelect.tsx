@@ -23,21 +23,27 @@ const CareerSelect = () => {
             <GlassCard
               key={c.id}
               delay={i * 0.05}
-              className="cursor-pointer group"
+              className="cursor-pointer group flex flex-col h-full"
             >
-              <div onClick={() => navigate(`/assessment/${c.id}`)}>
-                <span className="text-4xl mb-3 block">{c.icon}</span>
-                <h3 className="font-display font-semibold text-lg mb-1 group-hover:text-primary transition-colors">{c.title}</h3>
-                <p className="text-sm text-muted-foreground mb-3">{c.description}</p>
-                <div className="flex flex-wrap gap-1.5">
+              <div onClick={() => navigate(`/assessment/${c.id}`)} className="flex flex-col h-full">
+                <span className="text-4xl mb-3 block drop-shadow-lg">{c.icon}</span>
+                <h3 className="font-display font-bold text-xl mb-2 text-white group-hover:text-cyan-400 transition-colors drop-shadow-md">{c.title}</h3>
+                <p className="text-sm text-slate-300 mb-4 leading-relaxed flex-grow">{c.description}</p>
+                <div className="flex flex-wrap gap-2 mb-4">
                   {c.skills.slice(0, 4).map((s) => (
-                    <span key={s} className="text-xs px-2 py-0.5 rounded-full bg-primary/10 text-primary">{s}</span>
+                    <span key={s} className="text-xs px-2.5 py-1 rounded-full bg-[rgba(0,0,0,0.5)] border border-cyan-500/30 text-cyan-400 font-medium">
+                      {s}
+                    </span>
                   ))}
                   {c.skills.length > 4 && (
-                    <span className="text-xs px-2 py-0.5 rounded-full bg-secondary text-muted-foreground">+{c.skills.length - 4}</span>
+                    <span className="text-xs px-2.5 py-1 rounded-full bg-[rgba(0,0,0,0.5)] border border-[rgba(255,255,255,0.1)] text-slate-300 font-medium">
+                      +{c.skills.length - 4}
+                    </span>
                   )}
                 </div>
-                <p className="text-xs text-muted-foreground mt-3">💰 {c.avgSalary}</p>
+                <div className="pt-3 border-t border-[rgba(255,255,255,0.1)] mt-auto">
+                  <p className="text-sm font-semibold text-cyan-200">💰 {c.avgSalary}</p>
+                </div>
               </div>
             </GlassCard>
           ))}

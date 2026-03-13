@@ -1,31 +1,29 @@
 import { motion } from "framer-motion";
 import { Link } from "react-router-dom";
 import { ArrowRight, Brain, Target, FileText, Briefcase, Trophy, BookOpen, Sparkles, Zap, Users, Presentation, Star } from "lucide-react";
-import GlassCard from "@/components/GlassCard";
-import GlowButton from "@/components/GlowButton";
 import Navbar from "@/components/Navbar";
 
 const features = [
-  { icon: Brain, title: "AI Career Assessment", desc: "Smart questions that evaluate your skills and find knowledge gaps.", route: "/career-assessment", color: "text-blue-500" },
-  { icon: Target, title: "Personalized Roadmap", desc: "Get a custom learning path with the exact skills you need.", route: "/personalized-roadmap", color: "text-green-500" },
-  { icon: BookOpen, title: "Video Learning Modules", desc: "Curated YouTube tutorials organized into structured courses.", route: "/video-learning", color: "text-purple-500" },
-  { icon: FileText, title: "AI Resume Builder", desc: "Create and analyze resumes with AI-powered scoring.", route: "/resume-builder", color: "text-orange-500" },
-  { icon: Briefcase, title: "Smart Job Matching", desc: "AI-matched opportunities based on your skills and career path.", route: "/jobs-internships", color: "text-red-500" },
-  { icon: Trophy, title: "Gamification & Leaderboard", desc: "Earn points, track streaks, and compete with peers.", route: "/leaderboard", color: "text-yellow-500" },
-  { icon: Users, title: "Project Portfolio", desc: "Showcase your projects and skills professionally.", route: "/portfolio", color: "text-indigo-500" },
-  { icon: Sparkles, title: "AI Career Mentor", desc: "24/7 intelligent chatbot for career guidance.", route: "#", color: "text-pink-500" },
+  { icon: Brain, title: "AI Career Assessment", desc: "Smart questions that evaluate your skills and find knowledge gaps.", route: "/career-assessment", color: "text-cyan-400" },
+  { icon: Target, title: "Personalized Roadmap", desc: "Get a custom learning path with the exact skills you need.", route: "/personalized-roadmap", color: "text-green-400" },
+  { icon: BookOpen, title: "Video Learning Modules", desc: "Curated YouTube tutorials organized into structured courses.", route: "/video-learning", color: "text-purple-400" },
+  { icon: FileText, title: "AI Resume Builder", desc: "Create and analyze resumes with AI-powered scoring.", route: "/resume-builder", color: "text-orange-400" },
+  { icon: Briefcase, title: "Smart Job Matching", desc: "AI-matched opportunities based on your skills and career path.", route: "/jobs-internships", color: "text-red-400" },
+  { icon: Trophy, title: "Gamification & Leaderboard", desc: "Earn points, track streaks, and compete with peers.", route: "/leaderboard", color: "text-yellow-400" },
+  { icon: Users, title: "Project Portfolio", desc: "Showcase your projects and skills professionally.", route: "/portfolio", color: "text-indigo-400" },
+  { icon: Sparkles, title: "AI Career Mentor", desc: "24/7 intelligent chatbot for career guidance.", route: "#", color: "text-pink-400" },
 ];
 
 const Landing = () => {
   return (
-    <div className="min-h-screen animated-gradient-bg relative overflow-hidden">
+    <div className="min-h-screen bg-slate-900 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-slate-800 via-slate-900 to-black text-white relative overflow-hidden">
       {/* Enhanced Ambient Effects */}
-      <div className="absolute top-20 left-1/4 w-96 h-96 bg-primary/10 rounded-full blur-[120px] animate-glow-pulse" />
-      <div className="absolute bottom-0 right-1/4 w-80 h-80 bg-glow-blue/10 rounded-full blur-[100px] animate-glow-pulse" style={{ animationDelay: "1.5s" }} />
-      <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-gradient-to-r from-purple-500/5 to-pink-500/5 rounded-full blur-[150px] animate-pulse" />
+      <div className="absolute top-20 left-1/4 w-96 h-96 bg-cyan-500/20 rounded-full blur-[120px] animate-glow-pulse pointer-events-none" />
+      <div className="absolute bottom-0 right-1/4 w-80 h-80 bg-purple-500/20 rounded-full blur-[100px] animate-glow-pulse pointer-events-none" style={{ animationDelay: "1.5s" }} />
+      <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-gradient-to-r from-cyan-500/10 to-purple-500/10 rounded-full blur-[150px] animate-pulse pointer-events-none" />
 
       {/* Floating Particles */}
-      <div className="absolute inset-0 overflow-hidden">
+      <div className="absolute inset-0 overflow-hidden pointer-events-none">
         {[...Array(20)].map((_, i) => (
           <motion.div
             key={i}
@@ -62,12 +60,12 @@ const Landing = () => {
               initial={{ scale: 0 }}
               animate={{ scale: 1 }}
               transition={{ delay: 0.2, type: "spring", stiffness: 200 }}
-              className="inline-block glass px-6 py-2 text-sm text-primary font-medium mb-6 relative"
+              className="inline-flex items-center px-5 py-2 rounded-full bg-[rgba(255,255,255,0.08)] backdrop-blur-[16px] border border-[rgba(255,255,255,0.2)] text-sm text-cyan-300 font-semibold mb-6 flex-wrap shadow-[0_4px_30px_rgba(0,0,0,0.1)] relative"
             >
-              <Sparkles className="inline h-4 w-4 mr-2" />
+              <Sparkles className="inline h-4 w-4 mr-2 text-cyan-400" />
               🚀 AI-Powered Career Development
               <motion.div
-                className="absolute inset-0 bg-primary/20 rounded-lg"
+                className="absolute inset-0 bg-cyan-500/10 rounded-full"
                 animate={{ opacity: [0.5, 0.8, 0.5] }}
                 transition={{ duration: 2, repeat: Infinity }}
               />
@@ -77,17 +75,17 @@ const Landing = () => {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.4 }}
-              className="text-4xl sm:text-5xl lg:text-7xl font-display font-extrabold leading-tight mb-6"
+              className="text-4xl sm:text-5xl lg:text-7xl font-display font-extrabold leading-tight mb-6 text-white"
             >
               Your Path from{" "}
               <motion.span
-                className="gradient-text relative"
+                className="text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-cyan-200 relative inline-block"
                 whileHover={{ scale: 1.05 }}
                 transition={{ type: "spring", stiffness: 300 }}
               >
                 Beginner
                 <motion.div
-                  className="absolute -bottom-2 left-0 right-0 h-1 bg-gradient-to-r from-primary to-accent rounded-full"
+                  className="absolute -bottom-2 left-0 right-0 h-1 bg-gradient-to-r from-cyan-500 to-cyan-300 rounded-full"
                   initial={{ scaleX: 0 }}
                   animate={{ scaleX: 1 }}
                   transition={{ delay: 1, duration: 0.8 }}
@@ -95,13 +93,13 @@ const Landing = () => {
               </motion.span>
               <br />to{" "}
               <motion.span
-                className="gradient-text relative"
+                className="text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-purple-200 relative inline-block"
                 whileHover={{ scale: 1.05 }}
                 transition={{ type: "spring", stiffness: 300 }}
               >
                 Professional
                 <motion.div
-                  className="absolute -bottom-2 left-0 right-0 h-1 bg-gradient-to-r from-accent to-primary rounded-full"
+                  className="absolute -bottom-2 left-0 right-0 h-1 bg-gradient-to-r from-purple-500 to-purple-300 rounded-full"
                   initial={{ scaleX: 0 }}
                   animate={{ scaleX: 1 }}
                   transition={{ delay: 1.2, duration: 0.8 }}
@@ -113,10 +111,10 @@ const Landing = () => {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.6 }}
-              className="text-lg sm:text-xl text-muted-foreground max-w-3xl mx-auto mb-10"
+              className="text-lg sm:text-xl text-slate-300 max-w-3xl mx-auto mb-10 font-medium"
             >
               Don't know which skills to learn or where to start?{" "}
-              <span className="text-primary font-semibold">Learn2Hire</span> uses AI to assess your knowledge,
+              <span className="text-cyan-400 font-bold">Learn2Hire</span> uses AI to assess your knowledge,
               build a personalized roadmap, and connect you with real opportunities.
             </motion.p>
 
@@ -124,24 +122,19 @@ const Landing = () => {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.8 }}
-              className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-8"
+              className="flex flex-col sm:flex-row items-center justify-center gap-5 mb-8"
             >
               <Link to="/career-select">
-                <GlowButton size="lg" className="flex items-center gap-2 group">
-                  <motion.span
-                    whileHover={{ scale: 1.05 }}
-                    transition={{ type: "spring", stiffness: 400 }}
-                  >
-                    Start Your Journey
-                  </motion.span>
-                  <ArrowRight className="h-5 w-5 group-hover:translate-x-1 transition-transform" />
-                </GlowButton>
+                <button className="flex items-center gap-2 group px-8 py-3.5 rounded-full bg-cyan-500 text-white font-bold transition-all duration-300 hover:scale-105 shadow-[0_0_20px_rgba(6,182,212,0.5)] hover:shadow-[0_0_35px_rgba(6,182,212,0.8)] border border-cyan-400">
+                  <span>Start Your Journey</span>
+                  <ArrowRight className="h-5 w-5 group-hover:translate-x-1.5 transition-transform" />
+                </button>
               </Link>
               <Link to="/careers">
-                <GlowButton variant="secondary" size="lg" className="flex items-center gap-2">
+                <button className="flex items-center gap-2 px-8 py-3.5 rounded-full bg-[rgba(255,255,255,0.08)] backdrop-blur-[16px] border border-[rgba(255,255,255,0.2)] text-white font-bold transition-all duration-300 hover:bg-[rgba(255,255,255,0.15)] hover:border-[rgba(255,255,255,0.3)] hover:shadow-[0_4px_25px_rgba(255,255,255,0.15)] hover:-translate-y-0.5">
                   <Target className="h-5 w-5" />
                   Explore Careers
-                </GlowButton>
+                </button>
               </Link>
             </motion.div>
 
@@ -154,11 +147,10 @@ const Landing = () => {
             >
               <button
                 onClick={() => {
-                  // Trigger presentation mode with Shift+F5
                   const event = new KeyboardEvent('keydown', { key: 'F5', shiftKey: true });
                   window.dispatchEvent(event);
                 }}
-                className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-primary transition-colors group"
+                className="inline-flex items-center gap-2 text-sm text-slate-400 hover:text-cyan-400 transition-colors group"
               >
                 <Presentation className="h-4 w-4 group-hover:scale-110 transition-transform" />
                 Press Shift+F5 for Demo Mode
@@ -172,9 +164,9 @@ const Landing = () => {
       {/* Features */}
       <section id="features" className="py-20 px-6 relative">
         {/* Background Pattern */}
-        <div className="absolute inset-0 opacity-5">
+        <div className="absolute inset-0 opacity-10">
           <div className="absolute inset-0" style={{
-            backgroundImage: `url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%239C92AC' fill-opacity='0.1'%3E%3Ccircle cx='30' cy='30' r='2'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")`,
+            backgroundImage: `url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.1'%3E%3Ccircle cx='30' cy='30' r='2'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")`,
           }} />
         </div>
 
@@ -190,16 +182,16 @@ const Landing = () => {
               whileInView={{ scale: 1 }}
               viewport={{ once: true }}
               transition={{ type: "spring", stiffness: 200 }}
-              className="inline-block glass px-4 py-2 text-sm text-primary font-medium mb-4"
+              className="inline-block px-4 py-1.5 rounded-full text-sm text-cyan-300 font-medium mb-4 bg-cyan-500/10 border border-cyan-500/20"
             >
               ✨ Platform Features
             </motion.div>
-            <h2 className="text-3xl sm:text-4xl font-display font-bold mb-4">
+            <h2 className="text-3xl sm:text-4xl font-display font-bold mb-4 text-white">
               Everything You Need to{" "}
-              <span className="gradient-text relative">
+              <span className="text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-purple-400 relative inline-block">
                 Launch Your Career
                 <motion.div
-                  className="absolute -bottom-1 left-0 right-0 h-0.5 bg-gradient-to-r from-primary to-accent"
+                  className="absolute -bottom-1 left-0 right-0 h-0.5 bg-gradient-to-r from-cyan-400 to-purple-400"
                   initial={{ scaleX: 0 }}
                   whileInView={{ scaleX: 1 }}
                   viewport={{ once: true }}
@@ -207,7 +199,7 @@ const Landing = () => {
                 />
               </span>
             </h2>
-            <p className="text-muted-foreground max-w-xl mx-auto">
+            <p className="text-slate-300 max-w-xl mx-auto">
               From skill assessment to job placement — one platform, zero confusion.
             </p>
           </motion.div>
@@ -224,28 +216,28 @@ const Landing = () => {
                 className="group"
               >
                 <Link to={f.route} className="block h-full">
-                  <GlassCard className="h-full p-6 hover:shadow-2xl transition-all duration-300 group-hover:border-primary/50">
+                  <div className="h-full p-6 rounded-2xl bg-[rgba(255,255,255,0.03)] backdrop-blur-md border border-[rgba(255,255,255,0.08)] hover:bg-[rgba(255,255,255,0.08)] hover:border-[rgba(255,255,255,0.15)] hover:shadow-[0_8px_30px_rgba(6,182,212,0.15)] transition-all duration-300">
                     <motion.div
                       whileHover={{ scale: 1.1, rotate: 5 }}
                       transition={{ type: "spring", stiffness: 400 }}
-                      className={`inline-flex items-center justify-center w-12 h-12 rounded-xl bg-secondary/50 mb-4 ${f.color} group-hover:bg-primary/10 transition-colors`}
+                      className={`inline-flex items-center justify-center w-12 h-12 rounded-xl bg-slate-800 mb-4 ${f.color} group-hover:bg-slate-700 transition-colors shadow-inner`}
                     >
                       <f.icon className="h-6 w-6" />
                     </motion.div>
-                    <h3 className="font-display text-lg font-semibold mb-2 group-hover:text-primary transition-colors">
+                    <h3 className="font-display text-lg font-semibold mb-2 group-hover:text-cyan-300 transition-colors text-white">
                       {f.title}
                     </h3>
-                    <p className="text-sm text-muted-foreground leading-relaxed">
+                    <p className="text-sm text-slate-400 leading-relaxed font-medium">
                       {f.desc}
                     </p>
                     <motion.div
-                      className="mt-4 flex items-center text-xs text-primary font-medium opacity-0 group-hover:opacity-100 transition-opacity"
+                      className="mt-4 flex items-center text-xs text-cyan-400 font-medium opacity-0 group-hover:opacity-100 transition-opacity"
                       initial={{ x: -10 }}
                       whileHover={{ x: 0 }}
                     >
                       Learn more <ArrowRight className="h-3 w-3 ml-1" />
                     </motion.div>
-                  </GlassCard>
+                  </div>
                 </Link>
               </motion.div>
             ))}
@@ -254,7 +246,7 @@ const Landing = () => {
       </section>
 
       {/* Stats Section */}
-      <section className="py-16 px-6">
+      <section className="py-16 px-6 relative z-10">
         <div className="container mx-auto max-w-4xl">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
@@ -274,11 +266,11 @@ const Landing = () => {
                 whileInView={{ opacity: 1, scale: 1 }}
                 viewport={{ once: true }}
                 transition={{ delay: i * 0.1 }}
-                className="glass p-6"
+                className="bg-[rgba(255,255,255,0.03)] backdrop-blur-xl border border-[rgba(255,255,255,0.08)] p-6 rounded-2xl hover:bg-[rgba(255,255,255,0.08)] transition-all duration-300"
               >
-                <stat.icon className="h-8 w-8 text-primary mx-auto mb-2" />
-                <div className="text-2xl font-bold font-display">{stat.number}</div>
-                <div className="text-sm text-muted-foreground">{stat.label}</div>
+                <stat.icon className="h-8 w-8 text-cyan-400 mx-auto mb-2" />
+                <div className="text-2xl font-bold font-display text-white">{stat.number}</div>
+                <div className="text-sm text-slate-400 font-medium">{stat.label}</div>
               </motion.div>
             ))}
           </motion.div>
@@ -286,11 +278,13 @@ const Landing = () => {
       </section>
 
       {/* CTA */}
-      <section className="py-20 px-6">
+      <section className="py-20 px-6 relative z-10">
         <div className="container mx-auto max-w-4xl">
-          <GlassCard glow className="text-center py-12 px-8 relative overflow-hidden">
-            {/* Animated background */}
-            <div className="absolute inset-0 bg-gradient-to-r from-primary/5 via-transparent to-accent/5 animate-pulse" />
+          <div className="bg-[rgba(255,255,255,0.03)] backdrop-blur-[24px] border border-[rgba(255,255,255,0.1)] shadow-[0_8px_32px_rgba(0,0,0,0.3)] rounded-[2rem] text-center py-16 px-8 relative overflow-hidden">
+            {/* Animated background focus */}
+            <div className="absolute inset-0 bg-gradient-to-r from-cyan-500/5 via-transparent to-purple-500/5 animate-pulse" />
+            <div className="absolute -top-24 -right-24 w-64 h-64 bg-cyan-500/10 blur-[80px] rounded-full"></div>
+            <div className="absolute -bottom-24 -left-24 w-64 h-64 bg-purple-500/10 blur-[80px] rounded-full"></div>
 
             <motion.div
               initial={{ opacity: 0, scale: 0.9 }}
@@ -303,33 +297,28 @@ const Landing = () => {
                 transition={{ duration: 20, repeat: Infinity, ease: "linear" }}
                 className="inline-block mb-4"
               >
-                <Sparkles className="h-8 w-8 text-primary" />
+                <Sparkles className="h-10 w-10 text-cyan-400" />
               </motion.div>
 
-              <h2 className="text-3xl font-display font-bold mb-4">
-                Ready to Discover Your <span className="gradient-text">Career Path?</span>
+              <h2 className="text-3xl font-display font-bold mb-4 text-white">
+                Ready to Discover Your <span className="text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-cyan-200">Career Path?</span>
               </h2>
-              <p className="text-muted-foreground mb-8 max-w-xl mx-auto">
+              <p className="text-slate-300 mb-8 max-w-xl mx-auto font-medium">
                 Join thousands of students accelerating their careers with AI-powered guidance and personalized learning.
               </p>
 
-              <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
+              <div className="flex flex-col sm:flex-row items-center justify-center gap-5">
                 <Link to="/career-select">
-                  <GlowButton size="lg" className="flex items-center gap-2 group">
-                    <motion.span
-                      whileHover={{ scale: 1.05 }}
-                      transition={{ type: "spring", stiffness: 400 }}
-                    >
-                      Get Started Free
-                    </motion.span>
-                    <ArrowRight className="h-5 w-5 group-hover:translate-x-1 transition-transform" />
-                  </GlowButton>
+                  <button className="flex items-center gap-2 group px-8 py-3.5 rounded-full bg-cyan-500 text-white font-bold transition-all duration-300 hover:scale-105 shadow-[0_0_20px_rgba(6,182,212,0.5)] hover:shadow-[0_0_35px_rgba(6,182,212,0.8)] border border-cyan-400">
+                    <span>Get Started Free</span>
+                    <ArrowRight className="h-5 w-5 group-hover:translate-x-1.5 transition-transform" />
+                  </button>
                 </Link>
                 <Link to="/dashboard">
-                  <GlowButton variant="secondary" size="lg" className="flex items-center gap-2">
+                  <button className="flex items-center gap-2 px-8 py-3.5 rounded-full bg-[rgba(255,255,255,0.08)] backdrop-blur-[16px] border border-[rgba(255,255,255,0.2)] text-white font-bold transition-all duration-300 hover:bg-[rgba(255,255,255,0.15)] hover:border-[rgba(255,255,255,0.3)] hover:shadow-[0_4px_25px_rgba(255,255,255,0.15)] hover:-translate-y-0.5">
                     <Trophy className="h-5 w-5" />
                     View Demo Dashboard
-                  </GlowButton>
+                  </button>
                 </Link>
               </div>
 
@@ -338,19 +327,19 @@ const Landing = () => {
                 whileInView={{ opacity: 1 }}
                 viewport={{ once: true }}
                 transition={{ delay: 0.5 }}
-                className="mt-8 text-sm text-muted-foreground"
+                className="mt-8 text-sm text-slate-400 font-medium"
               >
                 ✨ No credit card required • 14-day free trial • Cancel anytime
               </motion.div>
             </motion.div>
-          </GlassCard>
+          </div>
         </div>
       </section>
 
       {/* Footer */}
-      <footer className="border-t border-border/30 py-8 px-6">
-        <div className="container mx-auto flex flex-col sm:flex-row items-center justify-between text-sm text-muted-foreground">
-          <span className="font-display font-semibold gradient-text">Learn2Hire</span>
+      <footer className="border-t border-[rgba(255,255,255,0.05)] py-8 px-6 relative z-10 bg-[rgba(15,23,42,0.4)] backdrop-blur-sm">
+        <div className="container mx-auto flex flex-col sm:flex-row items-center justify-between text-sm text-slate-400 font-medium">
+          <span className="font-display font-semibold text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-purple-400">Learn2Hire</span>
           <span>© 2026 Learn2Hire. All rights reserved.</span>
         </div>
       </footer>

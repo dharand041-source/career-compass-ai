@@ -1,0 +1,89 @@
+﻿[36mvite v5.4.19 [32mbuilding for production...[36m[39m
+transforming...
+node.exe : Browserslist: 
+browsers data (caniuse-lite) 
+is 9 months old. Please run:
+At line:1 char:1
++ & "C:\Program 
+Files\nodejs/node.exe" 
+"C:\Program 
+Files\nodejs/node_mo ...
++ ~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~
+    + CategoryInfo           
+   : NotSpecified: (Browser  
+  slist: b...ld. Please ru   
+ n::String) [], RemoteExc    
+eption
+    + FullyQualifiedErrorId  
+   : NativeCommandError
+ 
+  npx 
+update-browserslist-db@latest
+  Why you should do it 
+regularly: https://github.com
+/browserslist/update-db#readm
+e
+[32mΓ£ô[39m 37 modules transformed.
+[31mx[39m Build failed in 
+883ms
+[31merror during build:
+[31m[vite]: Rollup failed 
+to resolve import 
+"react-youtube" from "C:/User
+s/selva/OneDrive/Documents/ca
+reer/career-compass-ai/src/pa
+ges/Roadmap.tsx".
+This is most likely 
+unintended because it can 
+break your application at 
+runtime.
+If you do want to 
+externalize this module 
+explicitly add it to
+`build.rollupOptions.external
+`[31m
+    at viteWarn (file:///C:/U
+sers/selva/OneDrive/Documents
+/career/career-compass-ai/nod
+e_modules/vite/dist/node/chun
+ks/dep-C6uTJdX2.js:65839:17)
+    at onwarn (file:///C:/Use
+rs/selva/OneDrive/Documents/c
+areer/career-compass-ai/node_
+modules/@vitejs/plugin-react-
+swc/index.js:90:7)
+    at onRollupWarning (file:
+///C:/Users/selva/OneDrive/Do
+cuments/career/career-compass
+-ai/node_modules/vite/dist/no
+de/chunks/dep-C6uTJdX2.js:658
+69:5)
+    at onwarn (file:///C:/Use
+rs/selva/OneDrive/Documents/c
+areer/career-compass-ai/node_
+modules/vite/dist/node/chunks
+/dep-C6uTJdX2.js:65534:7)
+    at file:///C:/Users/selva
+/OneDrive/Documents/career/ca
+reer-compass-ai/node_modules/
+rollup/dist/es/shared/node-en
+try.js:19393:13
+    at Object.logger [as 
+onLog] (file:///C:/Users/selv
+a/OneDrive/Documents/career/c
+areer-compass-ai/node_modules
+/rollup/dist/es/shared/node-e
+ntry.js:21119:9)
+    at ModuleLoader.handleInv
+alidResolvedId (file:///C:/Us
+ers/selva/OneDrive/Documents/
+career/career-compass-ai/node
+_modules/rollup/dist/es/share
+d/node-entry.js:20008:26)
+    at file:///C:/Users/selva
+/OneDrive/Documents/career/ca
+reer-compass-ai/node_modules/
+rollup/dist/es/shared/node-en
+try.js:19966:26[39m
