@@ -118,7 +118,7 @@ export async function seedCourses() {
   }
 }
 
-// Auto-run if this file is executed directly
-if (require.main === module) {
+// If using this file in a Node context (e.g., script), guard against browser execution.
+if (typeof require !== "undefined" && require.main === module) {
   seedCourses();
 }
