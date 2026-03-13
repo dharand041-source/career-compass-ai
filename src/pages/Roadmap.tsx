@@ -60,10 +60,37 @@ const Roadmap = () => {
     setLessonProgress(loadedLessons);
   }, [career, subjectName, modules]);
 
-  const getLessonsForModule = (modName: string) => [
-    { id: `intro-${modName.toLowerCase().replace(/\s+/g, '-')}`, title: `Introduction to ${modName}`, videoId: "PkZNo7MFNFg" },
-    { id: `advanced-${modName.toLowerCase().replace(/\s+/g, '-')}`, title: `Advanced ${modName} Concepts`, videoId: "bJzb-RuUcMU" }
-  ];
+  const getLessonsForModule = (modName: string) => {
+    const lower = modName.toLowerCase();
+    if (lower.includes('python')) {
+      return [
+        { id: `intro-python`, title: `Introduction to Python`, videoId: "kqtD5dpn9C8" },
+        { id: `python-data-types`, title: `Python Data Types`, videoId: "bY6m6_IIN94" },
+        { id: `python-functions`, title: `Python Functions`, videoId: "9Os0o3wzS_I" }
+      ];
+    } else if (lower.includes('java') && !lower.includes('javascript')) {
+      return [
+        { id: `intro-java`, title: `Introduction to Java`, videoId: "A74TOX803D0" },
+        { id: `java-oop`, title: `Java OOP Concepts`, videoId: "UUOG80p6Y98" },
+        { id: `java-collections`, title: `Java Collections`, videoId: "viZzFEzB5bA" }
+      ];
+    } else if (lower.includes('web') || lower.includes('html') || lower.includes('css')) {
+      return [
+        { id: `intro-web`, title: `Introduction to ${modName}`, videoId: "UB1O30fR-EE" },
+        { id: `basics-web`, title: `${modName} Basics`, videoId: "ieTHC78giGQ" }
+      ];
+    } else if (lower.includes('data')) {
+      return [
+        { id: `intro-data`, title: `Introduction to Data Science`, videoId: "X3paOmcrTjQ" },
+        { id: `data-analysis`, title: `Data Analysis Basics`, videoId: "r-uOLxNrNk8" },
+        { id: `machine-learning`, title: `Machine Learning Intro`, videoId: "Gv9_4yMHFhI" }
+      ];
+    }
+    return [
+      { id: `intro-${modName.toLowerCase().replace(/\s+/g, '-')}`, title: `Introduction to ${modName}`, videoId: "PkZNo7MFNFg" },
+      { id: `advanced-${modName.toLowerCase().replace(/\s+/g, '-')}`, title: `Advanced ${modName} Concepts`, videoId: "bJzb-RuUcMU" }
+    ];
+  };
 
   useEffect(() => {
     const checkProgress = () => {
@@ -71,7 +98,7 @@ const Roadmap = () => {
         if (typeof playerRef.current.getPlayerState === 'function' && playerRef.current.getPlayerState() === 1) { // 1 = playing
           const currentTime = playerRef.current.getCurrentTime();
           const duration = playerRef.current.getDuration();
-          if (duration > 0 && (currentTime / duration) >= 0.9) {
+          if (duration > 0 && (currentTime / duration) >= 0.8) {
             setLessonProgress(prev => {
               if (prev[activeLesson] !== "Completed") {
                 // Call update outside if possible, but safe here with functional update mechanism
@@ -102,10 +129,10 @@ const Roadmap = () => {
         const nextLesson = lessons[currentIdx + 1];
 
         if (allCompleted) {
-          toast.success("Great job! You completed the lesson.", { icon: "🤖" });
+          toast.success("Great job! You completed this lesson.", { icon: "🤖" });
           markModuleComplete(modId);
         } else if (nextLesson) {
-          toast.success(`Great job! You completed the lesson. Ready for the next challenge? Start the "${nextLesson.title}" lesson.`, { icon: "🤖", duration: 5000 });
+          toast.success(`Great job! You completed this lesson. Next lesson is ready. Continue learning this skill.`, { icon: "🤖", duration: 5000 });
         }
       }
       return newProgress;
