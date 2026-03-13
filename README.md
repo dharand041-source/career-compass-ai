@@ -1,73 +1,76 @@
-# Welcome to your Lovable project
+# Learn2Hire – AI-Powered Career Development Platform
 
-## Project info
+Learn2Hire is a web-based platform designed to guide learners from beginner to professional level by evaluating their skills, generating personalized learning paths, and helping them build career-ready portfolios.
 
-**URL**: https://lovable.dev/projects/REPLACE_WITH_PROJECT_ID
+## Key Features
 
-## How can I edit this code?
+- **AI Career Assessment**: Evaluate your skills and get personalized career guidance based on your strengths.
+- **Personalized Learning Roadmap**: Follow a structured pathway of courses and milestones to reach your goals.
+- **Video Learning Modules**: Access curated video tutorials and courses matched to your skill level.
+- **AI Resume Builder**: Create professional, ATS-friendly resumes effortlessly.
+- **Smart Job Matching**: Discover job opportunities perfectly aligned with your current skills and experience.
+- **Gamification and Leaderboard**: Stay motivated by earning points, unlocking achievements, and competing with peers.
+- **Project Portfolio**: Build and showcase real-world projects to demonstrate your practical abilities to employers.
+- **AI Career Mentor Chatbot**: Get 24/7 instant guidance, interview preparation, and answers to your career questions.
 
-There are several ways of editing your application.
+## Technology Stack
 
-**Use Lovable**
+- **Frontend**: React
+- **Build Tool**: Vite
+- **Language**: TypeScript
+- **UI Components**: shadcn-ui
+- **Styling**: Tailwind CSS
+- **Backend & Database**: Supabase
+- **Authentication**: Supabase Auth
 
-Simply visit the [Lovable Project](https://lovable.dev/projects/REPLACE_WITH_PROJECT_ID) and start prompting.
+## Getting Started
 
-Changes made via Lovable will be committed automatically to this repo.
+To get a local copy up and running, follow these steps.
 
-**Use your preferred IDE**
+### Installation
 
-If you want to work locally using your own IDE, you can clone this repo and push changes. Pushed changes will also be reflected in Lovable.
+1. Clone the repository
+   ```bash
+   git clone <repository-url>
+   cd learn2hire
+   ```
 
-The only requirement is having Node.js & npm installed - [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating)
+2. Install dependencies
+   ```bash
+   npm install
+   ```
 
-Follow these steps:
+3. Run the development server
+   ```bash
+   npm run dev
+   ```
+   The development server will start locally.
 
-```sh
-# Step 1: Clone the repository using the project's Git URL.
-git clone <YOUR_GIT_URL>
+## Environment Setup
 
-# Step 2: Navigate to the project directory.
-cd <YOUR_PROJECT_NAME>
+You must configure Supabase environment variables for the backend and authentication to function properly. Create an environment file (e.g., `.env`) and add your project's keys:
+- `SUPABASE_URL`
+- `SUPABASE_ANON_KEY`
 
-# Step 3: Install the necessary dependencies.
-npm i
+*(Note: Depending on your Vite configuration, you may need to prefix these variables with `VITE_`)*
 
-# Step 4: Start the development server with auto-reloading and an instant preview.
-npm run dev
-```
+## Project Structure
 
-**Edit a file directly in GitHub**
+A quick overview of the main project folders:
+- **src/**: Main source code for the application.
+- **components/**: Reusable user interface elements and widgets.
+- **pages/**: Application routes and main view components.
+- **services/**: API functions, Supabase integrations, and logic.
+- **assets/**: Static files such as images, icons, and global stylesheets.
 
-- Navigate to the desired file(s).
-- Click the "Edit" button (pencil icon) at the top right of the file view.
-- Make your changes and commit the changes.
+## Deployment
 
-**Use GitHub Codespaces**
+The project can be deployed easily using modern hosting platforms such as Vercel, Netlify, or other Node-based deployment services. Simply link your repository, set the build command (typically `npm run build`), specify the output directory (`dist`), and add your environment variables to the platform's settings.
 
-- Navigate to the main page of your repository.
-- Click on the "Code" button (green button) near the top right.
-- Select the "Codespaces" tab.
-- Click on "New codespace" to launch a new Codespace environment.
-- Edit files directly within the Codespace and commit and push your changes once you're done.
+## Contribution
 
-## What technologies are used for this project?
+We welcome contributions to Learn2Hire! Any improvements, bug fixes, or feature suggestions are greatly appreciated. Feel free to fork the repository, make your changes, and submit a pull request to help us build a better career development platform. 
 
-This project is built with:
+## License
 
-- Vite
-- TypeScript
-- React
-- shadcn-ui
-- Tailwind CSS
-
-## How can I deploy this project?
-
-Simply open [Lovable](https://lovable.dev/projects/REPLACE_WITH_PROJECT_ID) and click on Share -> Publish.
-
-## Can I connect a custom domain to my Lovable project?
-
-Yes, you can!
-
-To connect a domain, navigate to Project > Settings > Domains and click Connect Domain.
-
-Read more here: [Setting up a custom domain](https://docs.lovable.dev/features/custom-domain#custom-domain)
+This project is licensed under the MIT License.

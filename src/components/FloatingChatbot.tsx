@@ -58,6 +58,17 @@ const FloatingChatbot = () => {
     await new Promise(resolve => setTimeout(resolve, 1000 + Math.random() * 2000));
 
     const lowerMessage = userMessage.toLowerCase();
+    
+    // Check current path to provide contextual career advice
+    const currentPath = window.location.pathname;
+    let pathContext = "";
+    if (currentPath.includes("assessment/")) {
+        const careerId = currentPath.split("assessment/")[1];
+        pathContext = `You are currently taking the assessment for ${careerId.replace("-", " ")}. `;
+    } else if (currentPath.includes("roadmap/")) {
+        const careerId = currentPath.split("roadmap/")[1];
+        pathContext = `You are viewing the roadmap for ${careerId.replace("-", " ")}. `;
+    }
 
     // Quick action responses
     if (lowerMessage.includes("suggest skills") || lowerMessage.includes("suggest-skills")) {
@@ -69,11 +80,11 @@ const FloatingChatbot = () => {
     }
 
     if (lowerMessage.includes("find jobs") || lowerMessage.includes("internships")) {
-      return "💼 **Job & Internship Search Strategy:**\n\n**Where to Look:**\n• LinkedIn Jobs\n• Indeed, Glassdoor\n• Company career pages\n• AngelList (for startups)\n• Your university's career center\n\n**Pro Tips:**\n• Set up job alerts for your target roles\n• Network on LinkedIn - connect with alumni\n• Customize your resume for each application\n• Follow up 1 week after applying\n• Practice coding interviews on LeetCode\n\n**Our Platform:** Check the Jobs & Internships section for AI-matched opportunities based on your skills!";
+      return `💼 **Job & Internship Search Strategy:**\n\n${pathContext}**Where to Look:**\n• LinkedIn Jobs\n• Indeed, Glassdoor\n• Company career pages\n• AngelList (for startups)\n• Your university's career center\n\n**Pro Tips:**\n• Set up job alerts for your target roles\n• Network on LinkedIn - connect with alumni\n• Customize your resume for each application\n• Follow up 1 week after applying\n• Practice coding interviews on LeetCode\n\n**Our Platform:** Check the Jobs & Internships section for AI-matched opportunities based on your skills!`;
     }
 
     if (lowerMessage.includes("career advice") || lowerMessage.includes("career path")) {
-      return "🎯 **Career Path Guidance:**\n\n**Steps to Choose Your Path:**\n1. **Self-Assessment** - What are you passionate about?\n2. **Skills Inventory** - What are you good at?\n3. **Market Research** - What's in demand?\n4. **Try It Out** - Take our career assessment!\n\n**Popular Tech Career Paths:**\n• **Software Development** - Build applications and systems\n• **Data Science** - Analyze data and build ML models\n• **Product Management** - Lead product development\n• **DevOps** - Bridge development and operations\n• **Cybersecurity** - Protect digital assets\n\n**My Advice:** Start with our AI career assessment to get data-driven recommendations based on your interests and skills!";
+      return `🎯 **Career Path Guidance:**\n\n${pathContext}\n\n**Steps to Choose Your Path:**\n1. **Self-Assessment** - What are you passionate about?\n2. **Skills Inventory** - What are you good at?\n3. **Market Research** - What's in demand?\n4. **Try It Out** - Take our career assessment!\n\n**Popular Tech Career Paths:**\n• **Software Development** - Build applications and systems\n• **Data Science** - Analyze data and build ML models\n• **Product Management** - Lead product development\n• **DevOps** - Bridge development and operations\n• **Cybersecurity** - Protect digital assets\n\n**My Advice:** Start with our AI career assessment to get data-driven recommendations based on your interests and skills!`;
     }
 
     // Career guidance responses
@@ -130,11 +141,15 @@ const FloatingChatbot = () => {
 
     // Default responses
     const defaultResponses = [
-      "I'm your AI Career Mentor! I can help you with career guidance, skill development, resume building, job search, and platform navigation. What specific area would you like assistance with?",
-      "As your career coach, I'm here to guide you through every step of your professional journey. Whether it's choosing a career path, learning new skills, or landing your dream job, I've got your back!",
-      "Welcome to your personalized career development experience! I specialize in helping ambitious individuals like you accelerate their career growth. What challenges are you facing right now?",
-      "I'm excited to be your AI career mentor! With the right guidance and consistent effort, you can achieve amazing things in your career. What would you like to focus on today?",
+      `${pathContext}I'm your AI Career Mentor! I can help you with career guidance, skill development, resume building, job search, and platform navigation. What specific area would you like assistance with?`,
+      `${pathContext}As your career coach, I'm here to guide you through every step of your professional journey. Whether it's choosing a career path, learning new skills, or landing your dream job, I've got your back!`,
+      `${pathContext}Welcome to your personalized career development experience! I specialize in helping ambitious individuals like you accelerate their career growth. What challenges are you facing right now?`,
+      `${pathContext}I'm excited to be your AI career mentor! With the right guidance and consistent effort, you can achieve amazing things in your career. What would you like to focus on today?`,
     ];
+
+    if (pathContext !== "") {
+      return `Based on your current page... ${pathContext}\n\nI can help you prepare for this role by asking practice questions or suggesting skills. Just ask me "What should I focus on for this career?" or "Ask me a question about this!"`;
+    }
 
     return defaultResponses[Math.floor(Math.random() * defaultResponses.length)];
   };
