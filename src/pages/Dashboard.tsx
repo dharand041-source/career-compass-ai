@@ -1,3 +1,4 @@
+import { useState, useEffect } from "react";
 import { useLocation, Link } from "react-router-dom";
 import { motion } from "framer-motion";
 import { BookOpen, FileText, Briefcase, Trophy, Target, TrendingUp, Award, Flame, Star, Calendar, Zap, Users, Sparkles } from "lucide-react";
@@ -8,6 +9,9 @@ import Navbar from "@/components/Navbar";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
+import { careers } from "@/data/careers";
+import { useSupabaseAuth } from "@/hooks/useSupabaseAuth";
+import { useNavigate } from "react-router-dom";
 
 interface DashboardState {
   interviewScore?: number;
@@ -15,40 +19,128 @@ interface DashboardState {
 }
 
 const Dashboard = () => {
-  const location = useLocation();
-  const { interviewScore = 14, interviewTotal = 20 } = (location.state as DashboardState) || {};
+  const { user: supabaseUser, loading: supabaseLoading } = useSupabaseAuth();
+  const navigate = useNavigate();
+  const [authLoading, setAuthLoading] = useState(true);
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
 
-  // Mock user data - in real app this would come from context/state
-  const userStats = {
-    level: 5,
-    xp: 1250,
-    xpToNext: 1500,
-    currentStreak: 7,
-    longestStreak: 12,
-    totalPoints: 2450,
-    badges: ['First Assessment', 'Week Warrior', 'Skill Builder', 'Interview Ready'],
-    recentAchievements: [
-      { title: 'Completed Python Basics', xp: 100, time: '2 hours ago' },
-      { title: '7-Day Learning Streak', xp: 50, time: '1 day ago' },
-      { title: 'Resume Score 80+', xp: 75, time: '3 days ago' }
-    ]
-  };
+  useEffect(() => {
+    const checkAuth = async () => {
+      // 1. Check local backend token
+      const localToken = localStorage.getItem("authToken");
+      if (localToken) {
+        setIsAuthenticated(true);
+        setAuthLoading(false);
+        return;
+      }
+
+      // 2. Fallback to Supabase
+      if (!supabaseLoading) {
+        if (supabaseUser) {
+          setIsAuthenticated(true);
+        } else {
+          navigate("/auth");
+        }
+        setAuthLoading(false);
+      }
+    };
+
+    checkAuth();
+  }, [supabaseUser, supabaseLoading, navigate]);
+
+  const [realStats, setRealStats] = useState({
+    careerPath: "Not Started",
+    skillsLearned: 0,
+    totalSkills: 0,
+    interviewScore: 0,
+    interviewTotal: 0,
+    resumeScore: 0,
+    jobMatches: 0,
+    level: 1,
+    xp: 0,
+    xpToNext: 1000,
+    badges: [] as string[],
+    recentActivity: [] as any[]
+  });
+
+  useEffect(() => {
+    // 1. Get interview data
+    const interviews = JSON.parse(localStorage.getItem("learn2hire_interviews") || "[]");
+    const lastInterview = interviews[interviews.length - 1];
+    const totalInterviewPoints = interviews.reduce((acc: number, curr: any) => acc + curr.earned_points, 0);
+    const totalPossiblePoints = interviews.reduce((acc: number, curr: any) => acc + curr.total_questions, 0);
+    
+    // 2. Scan module progress
+    let completedModules = 0;
+    const moduleKeys = Object.keys(localStorage).filter(k => k.startsWith("module_complete_"));
+    completedModules = moduleKeys.length;
+
+    // 3. Determine Career Path (from last interview or just generic)
+    const activeCareerId = lastInterview?.job_role || "software-dev";
+    const career = careers.find(c => c.id === activeCareerId);
+    const totalModules = career?.skills.length || 8;
+
+    // 4. Calculate XP and Level
+    // Base: 100 XP per interview, 50 XP per module
+    const calculatedXp = (interviews.length * 100) + (completedModules * 50);
+    const calculatedLevel = Math.floor(calculatedXp / 1000) + 1;
+    const xpToNext = calculatedLevel * 1000;
+
+    // 5. Dynamic Badges
+    const badges = [];
+    if (interviews.length > 0) badges.push("Interview Ready");
+    if (completedModules > 0) badges.push("Skill Builder");
+    if (calculatedLevel > 1) badges.push("Level Up");
+
+    setRealStats({
+      careerPath: career?.title || "Not Started",
+      skillsLearned: completedModules,
+      totalSkills: totalModules,
+      interviewScore: totalInterviewPoints,
+      interviewTotal: totalPossiblePoints,
+      resumeScore: 65, // Static for now until resume parser is real
+      jobMatches: 0, // Will be updated by real job logic
+      level: calculatedLevel,
+      xp: calculatedXp,
+      xpToNext: xpToNext,
+      badges: badges,
+      recentActivity: interviews.slice(-3).map((inv: any) => ({
+        title: `${inv.job_role} Interview`,
+        xp: 100,
+        time: new Date(inv.timestamp).toLocaleDateString()
+      }))
+    });
+  }, []);
 
   const stats = [
-    { icon: Target, label: "Career Path", value: "Software Dev", color: "text-primary" },
-    { icon: BookOpen, label: "Skills Learned", value: "5 / 8", color: "text-accent" },
-    { icon: TrendingUp, label: "Interview Score", value: `${interviewScore}/${interviewTotal}`, color: "text-primary" },
-    { icon: Trophy, label: "Leaderboard Rank", value: "#10", color: "text-accent" },
-    { icon: FileText, label: "Resume Score", value: "72 / 100", color: "text-primary" },
-    { icon: Briefcase, label: "Job Matches", value: "8", color: "text-accent" },
+    { icon: Target, label: "Career Path", value: realStats.careerPath, color: "text-primary" },
+    { icon: BookOpen, label: "Skills Learned", value: `${realStats.skillsLearned} / ${realStats.totalSkills}`, color: "text-accent" },
+    { icon: TrendingUp, label: "Interview Success", value: realStats.interviewTotal > 0 ? `${Math.round((realStats.interviewScore/realStats.interviewTotal)*100)}%` : "0%", color: "text-primary" },
+    { icon: Trophy, label: "Points Earned", value: realStats.interviewScore.toString(), color: "text-accent" },
+    { icon: FileText, label: "Resume Analysis", value: "N/A", color: "text-primary" },
+    { icon: Briefcase, label: "Matches", value: realStats.jobMatches.toString(), color: "text-accent" },
   ];
 
-  const skillProgress = [
-    { name: 'Python', progress: 85, level: 'Advanced' },
-    { name: 'JavaScript', progress: 70, level: 'Intermediate' },
-    { name: 'React', progress: 60, level: 'Intermediate' },
-    { name: 'Data Structures', progress: 45, level: 'Beginner' },
+  // Dynamic Skill Progress based on completed modules
+  const skillProgress = Object.keys(localStorage)
+    .filter(k => k.startsWith("module_complete_"))
+    .map(key => {
+      const parts = key.split("_");
+      const name = parts[parts.length - 1].replace(/-/g, " ");
+      return { name: name.charAt(0).toUpperCase() + name.slice(1), progress: 100, level: 'Completed' };
+    }).slice(0, 4);
+
+  const displaySkills = skillProgress.length > 0 ? skillProgress : [
+    { name: 'Initial Assessment', progress: 100, level: 'Beginner' }
   ];
+
+  if (authLoading) {
+    return (
+      <div className="min-h-screen animated-gradient-bg flex items-center justify-center">
+        <div className="w-12 h-12 border-4 border-primary/30 border-t-primary rounded-full animate-spin" />
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen animated-gradient-bg">
@@ -60,11 +152,11 @@ const Dashboard = () => {
             <div className="flex items-center gap-2">
               <Badge variant="secondary" className="flex items-center gap-1">
                 <Star className="h-3 w-3" />
-                Level {userStats.level}
+                Level {realStats.level}
               </Badge>
               <Badge variant="outline" className="flex items-center gap-1">
                 <Zap className="h-3 w-3" />
-                {userStats.xp} XP
+                {realStats.xp} XP
               </Badge>
             </div>
           </div>
@@ -75,17 +167,17 @@ const Dashboard = () => {
         <GlassCard glow className="mb-8">
           <div className="flex items-center justify-between mb-4">
             <div>
-              <h3 className="font-display font-semibold">Level {userStats.level} Progress</h3>
+              <h3 className="font-display font-semibold">Level {realStats.level} Progress</h3>
               <p className="text-sm text-muted-foreground">
-                {userStats.xpToNext - userStats.xp} XP to next level
+                {realStats.xpToNext - realStats.xp} XP to next level
               </p>
             </div>
             <div className="text-right">
-              <p className="text-2xl font-bold">{userStats.xp}/{userStats.xpToNext}</p>
+              <p className="text-2xl font-bold">{realStats.xp}/{realStats.xpToNext}</p>
               <p className="text-xs text-muted-foreground">XP</p>
             </div>
           </div>
-          <Progress value={(userStats.xp / userStats.xpToNext) * 100} className="h-3" />
+          <Progress value={(realStats.xp / realStats.xpToNext) * 100} className="h-3" />
         </GlassCard>
 
         {/* Stats grid */}
@@ -113,11 +205,11 @@ const Dashboard = () => {
             <div className="space-y-3">
               <div className="flex justify-between items-center">
                 <span className="text-sm">Current Streak</span>
-                <Badge variant="secondary">{userStats.currentStreak} days</Badge>
+                <Badge variant="secondary">1 day</Badge>
               </div>
               <div className="flex justify-between items-center">
                 <span className="text-sm">Longest Streak</span>
-                <Badge variant="outline">{userStats.longestStreak} days</Badge>
+                <Badge variant="outline">1 day</Badge>
               </div>
             </div>
           </GlassCard>
@@ -128,15 +220,16 @@ const Dashboard = () => {
               <Award className="h-8 w-8 text-yellow-500" />
               <div>
                 <h3 className="font-display font-semibold">Achievements</h3>
-                <p className="text-sm text-muted-foreground">{userStats.badges.length} badges earned</p>
+                <p className="text-sm text-muted-foreground">{realStats.badges.length} badges earned</p>
               </div>
             </div>
             <div className="flex flex-wrap gap-2">
-              {userStats.badges.map((badge) => (
+              {realStats.badges.map((badge) => (
                 <Badge key={badge} variant="secondary" className="text-xs">
                   🏆 {badge}
                 </Badge>
               ))}
+              {realStats.badges.length === 0 && <span className="text-xs text-slate-500 italic">No badges yet...</span>}
             </div>
           </GlassCard>
 
@@ -146,16 +239,17 @@ const Dashboard = () => {
               <Calendar className="h-8 w-8 text-blue-500" />
               <div>
                 <h3 className="font-display font-semibold">Recent Activity</h3>
-                <p className="text-sm text-muted-foreground">Latest achievements</p>
+                <p className="text-sm text-muted-foreground">Latest interview sessions</p>
               </div>
             </div>
             <div className="space-y-2">
-              {userStats.recentAchievements.map((achievement, index) => (
+              {realStats.recentActivity.map((activity, index) => (
                 <div key={index} className="flex justify-between items-center text-sm">
-                  <span className="truncate">{achievement.title}</span>
-                  <Badge variant="outline" className="text-xs">+{achievement.xp} XP</Badge>
+                  <span className="truncate">{activity.title}</span>
+                  <Badge variant="outline" className="text-xs">{activity.time}</Badge>
                 </div>
               ))}
+              {realStats.recentActivity.length === 0 && <span className="text-xs text-slate-500 italic">No activity recorded...</span>}
             </div>
           </GlassCard>
         </div>
@@ -167,7 +261,7 @@ const Dashboard = () => {
             Skill Development Progress
           </h3>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            {skillProgress.map((skill, index) => (
+            {displaySkills.map((skill, index) => (
               <motion.div
                 key={skill.name}
                 initial={{ opacity: 0, x: -20 }}
@@ -189,28 +283,26 @@ const Dashboard = () => {
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
           <GlassCard delay={0.2}>
             <h3 className="font-display font-semibold mb-4">Learning Progress</h3>
-            <AnimatedProgress value={62} variant="primary" className="mb-4" />
-            <p className="text-sm text-muted-foreground">5 of 8 skill modules completed</p>
+            <AnimatedProgress value={realStats.totalSkills > 0 ? (realStats.skillsLearned / realStats.totalSkills) * 100 : 0} variant="primary" className="mb-4" />
+            <p className="text-sm text-muted-foreground">{realStats.skillsLearned} of {realStats.totalSkills} modules completed</p>
             <div className="flex items-center gap-2 mt-4">
-              <Link to="/roadmap/software-dev" className="flex-1">
-                <GlowButton variant="secondary" size="sm" className="w-full">Continue Learning</GlowButton>
-              </Link>
-              <Link to="/video-learning">
-                <GlowButton variant="secondary" size="sm">Watch Videos</GlowButton>
+              <Link to="/careers" className="flex-1">
+                <GlowButton variant="secondary" size="sm" className="w-full">Explore Roadmap</GlowButton>
               </Link>
             </div>
           </GlassCard>
 
           <GlassCard delay={0.3}>
-            <h3 className="font-display font-semibold mb-4">Resume Score</h3>
-            <AnimatedProgress value={72} variant="accent" className="mb-4" />
-            <p className="text-sm text-muted-foreground">Add more project descriptions to improve your score.</p>
+            <h3 className="font-display font-semibold mb-4">Interview Accuracy</h3>
+            <AnimatedProgress 
+              value={realStats.interviewTotal > 0 ? (realStats.interviewScore / realStats.interviewTotal) * 100 : 0} 
+              variant="accent" 
+              className="mb-4" 
+            />
+            <p className="text-sm text-muted-foreground">Current technical accuracy based on real evaluations.</p>
             <div className="flex items-center gap-2 mt-4">
-              <Link to="/resume" className="flex-1">
-                <GlowButton variant="secondary" size="sm" className="w-full">Improve Resume</GlowButton>
-              </Link>
-              <Link to="/resume-builder">
-                <GlowButton variant="secondary" size="sm">AI Builder</GlowButton>
+              <Link to="/interview" className="flex-1">
+                <GlowButton variant="secondary" size="sm" className="w-full">Practice More</GlowButton>
               </Link>
             </div>
           </GlassCard>

@@ -24,6 +24,7 @@ import ErrorBoundary from "./components/ErrorBoundary";
 import FloatingChatbot from "./components/FloatingChatbot";
 import Portfolio from "./pages/Portfolio";
 import CareerMentor from "./pages/CareerMentor";
+import Verify from "./pages/Verify";
 import PresentationMode from "./components/PresentationMode";
 import { useState, useEffect } from "react";
 
@@ -59,6 +60,7 @@ const App = () => {
             <Route path="/assessment/:careerId" element={<Assessment />} />
             <Route path="/roadmap/:careerId" element={<Roadmap />} />
             <Route path="/interview" element={<Interview />} />
+            <Route path="/interview/:careerId" element={<Interview />} />
             <Route path="/dashboard" element={<Dashboard />} />
             <Route path="/resume" element={<Resume />} />
             <Route path="/jobs" element={<Jobs />} />
@@ -76,6 +78,7 @@ const App = () => {
             <Route path="/career-mentor" element={<CareerMentor />} />
             <Route path="/portfolio" element={<Portfolio />} />
             <Route path="/auth" element={<Auth />} />
+            <Route path="/verify" element={<Verify />} />
             <Route path="*" element={<NotFound />} />
           </Routes>
           <FloatingChatbot />

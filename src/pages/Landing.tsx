@@ -62,8 +62,14 @@ const Landing = () => {
               transition={{ delay: 0.2, type: "spring", stiffness: 200 }}
               className="inline-flex items-center px-5 py-2 rounded-full bg-[rgba(255,255,255,0.08)] backdrop-blur-[16px] border border-[rgba(255,255,255,0.2)] text-sm text-cyan-300 font-semibold mb-6 flex-wrap shadow-[0_4px_30px_rgba(0,0,0,0.1)] relative"
             >
-              <Sparkles className="inline h-4 w-4 mr-2 text-cyan-400" />
-              🚀 AI-Powered Career Development
+              <div className="flex items-center justify-center w-6 h-6 rounded-md bg-white/5 border border-white/10 mr-3">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" className="text-cyan-400">
+                  <path d="M12 2L2 7L12 12L22 7L12 2Z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                  <path d="M2 17L12 22L22 17" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                  <path d="M2 12L12 17L22 12" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                </svg>
+              </div>
+              AI-Powered Career Development
               <motion.div
                 className="absolute inset-0 bg-cyan-500/10 rounded-full"
                 animate={{ opacity: [0.5, 0.8, 0.5] }}
@@ -339,9 +345,18 @@ const Landing = () => {
       {/* Footer */}
       <footer className="border-t border-[rgba(255,255,255,0.05)] py-8 px-6 relative z-10 bg-[rgba(15,23,42,0.4)] backdrop-blur-sm">
         <div className="container mx-auto flex flex-col sm:flex-row items-center justify-between text-sm text-slate-400 font-medium">
-          <span className="font-display font-bold text-white tracking-tight">
-            Learn<span className="text-slate-400">2</span>Hire
-          </span>
+          <div className="flex items-center gap-2 mb-4 sm:mb-0">
+            <div className="p-1.5 rounded-lg bg-white/5 border border-white/10">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" className="text-white opacity-90">
+                <path d="M12 2L2 7L12 12L22 7L12 2Z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                <path d="M2 17L12 22L22 17" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                <path d="M2 12L12 17L22 12" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+              </svg>
+            </div>
+            <span className="font-display font-bold text-white tracking-tight">
+              Learn<span className="text-slate-400">2</span>Hire
+            </span>
+          </div>
           <span>© 2026 Learn2Hire. All rights reserved.</span>
         </div>
       </footer>

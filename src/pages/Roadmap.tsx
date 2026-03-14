@@ -256,7 +256,7 @@ const Roadmap = () => {
         </div>
 
         <div className="mt-12 flex flex-col sm:flex-row gap-4 justify-center pt-8 border-t border-white/10">
-          <Link to="/interview">
+          <Link to={`/interview/${careerId}`}>
             <GlowButton className="flex items-center gap-2 w-full sm:w-auto">
               Start Interview Prep <ArrowRight className="h-4 w-4" />
             </GlowButton>

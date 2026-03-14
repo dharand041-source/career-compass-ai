@@ -234,3 +234,273 @@ export const leaderboardData = [
   { rank: 9, name: "Chris Park", points: 1650, avatar: "CP", streak: 14 },
   { rank: 10, name: "You", points: 1200, avatar: "YO", streak: 7 },
 ];
+
+export interface VoiceInterviewQuestion {
+  id: number;
+  question: string;
+  referenceAnswer: string;
+  keywords: string[];
+}
+
+export const voiceInterviewBank: Record<string, VoiceInterviewQuestion[]> = {
+  "software-dev": [
+    { 
+      id: 1, 
+      question: "How do you ensure your code is scalable and maintainable?",
+      referenceAnswer: "To ensure scalability and maintainability, I focus on clean code principles like SOLID, use appropriate design patterns, write modular components, implement comprehensive unit tests, and perform regular code reviews.",
+      keywords: ["clean code", "SOLID", "design patterns", "modular", "unit tests", "code reviews", "maintainable", "scalable"]
+    },
+    { 
+      id: 2, 
+      question: "Explain the difference between a process and a thread.",
+      referenceAnswer: "A process is an independent program in execution with its own memory space, while a thread is a unit of execution within a process. Threads share the same memory space as their parent process, allowing for easier communication but requiring careful synchronization.",
+      keywords: ["independent", "memory space", "unit of execution", "share", "synchronization", "communication"]
+    },
+    { 
+      id: 3, 
+      question: "Tell me about a time you had to debug a complex production issue.",
+      referenceAnswer: "When debugging production issues, I first reproduce the environment, analyze the logs, use monitoring tools to pinpoint the bottleneck, and then apply a systematic approach to isolate the root cause before implementing a fix.",
+      keywords: ["reproduce", "logs", "monitoring", "bottleneck", "systematic", "root cause", "isolate"]
+    },
+    { 
+      id: 4, 
+      question: "What are the key differences between SQL and NoSQL databases?",
+      referenceAnswer: "SQL databases are relational, use structured schemas, and are typically vertically scalable. NoSQL databases are non-relational, have dynamic schemas for unstructured data, and are horizontally scalable, making them better for big data or real-time web apps.",
+      keywords: ["relational", "structured", "schema", "vertical", "non-relational", "dynamic", "horizontal", "big data"]
+    },
+    { 
+      id: 5, 
+      question: "How do you approach learning a new programming language or framework?",
+      referenceAnswer: "I start with the official documentation and 'Hello World' examples, then build a small project to apply the concepts, participate in community forums, and read existing codebases to understand best practices.",
+      keywords: ["documentation", "project", "apply", "community", "best practices", "read", "codebase"]
+    }
+  ],
+  "data-scientist": [
+    { 
+      id: 1, 
+      question: "What is the difference between supervised and unsupervised learning?",
+      referenceAnswer: "Supervised learning uses labeled data to train models that predict outcomes, while unsupervised learning uses unlabeled data to find hidden patterns or groupings within the information.",
+      keywords: ["labeled", "unlabeled", "predict", "patterns", "hidden", "grouping"]
+    },
+    { 
+      id: 2, 
+      question: "How do you handle missing or outliers in a dataset?",
+      referenceAnswer: "For missing data, I can use imputation or removal depending on the volume. For outliers, I use statistical methods like Z-score or IQR to detect them, and then decide whether to clip, remove, or transform them based on the context.",
+      keywords: ["imputation", "removal", "Z-score", "IQR", "detect", "clip", "transform", "context"]
+    },
+    { 
+      id: 3, 
+      question: "Explain the concept of 'p-value' in statistics.",
+      referenceAnswer: "The p-value is the probability of obtaining test results at least as extreme as the results actually observed, under the assumption that the null hypothesis is correct. A low p-value (typically < 0.05) leads to rejection of the null hypothesis.",
+      keywords: ["probability", "null hypothesis", "extreme", "probability", "rejection", "significance"]
+    },
+    { 
+      id: 4, 
+      question: "Walk me through how you would build a recommendation system.",
+      referenceAnswer: "I would choose between collaborative filtering, which looks at user similarity, or content-based filtering, which looks at item features. I'd then preprocess data, select an algorithm like matrix factorization, and evaluate with metrics like RMSE.",
+      keywords: ["collaborative", "content-based", "item features", "matrix factorization", "RMSE", "algorithm", "evaluation"]
+    },
+    { 
+      id: 5, 
+      question: "Tell me about a data project where your findings directly impacted a business decision.",
+      referenceAnswer: "The answer should describe a specific scenario, the data analyzed (e.g., customer churn), the analytical method used, and the resulting business action (e.g., a targeted marketing campaign that increased retention).",
+      keywords: ["scenario", "method", "impact", "business decision", "action", "retention", "findings"]
+    }
+  ],
+  "web-dev": [
+    { 
+      id: 1, 
+      question: "How do you optimize a website's performance for mobile users?",
+      referenceAnswer: "I use responsive design, compress images, implement lazy loading, minify CSS and JavaScript, utilize browser caching, and reduce server response times using CDNs and efficient hosting.",
+      keywords: ["responsive", "compress", "lazy loading", "minify", "caching", "CDN", "server response"]
+    },
+    { 
+      id: 2, 
+      question: "What is the difference between client-side and server-side rendering?",
+      referenceAnswer: "Client-side rendering (CSR) renders content in the browser using JavaScript, resulting in faster subsequent transitions. Server-side rendering (SSR) generates the full HTML on the server, which is better for SEO and initial load times.",
+      keywords: ["browser", "JavaScript", "SEO", "initial load", "HTML", "server", "rendering"]
+    },
+    { 
+      id: 3, 
+      question: "Explain how CORS works and why it is important for security.",
+      referenceAnswer: "Cross-Origin Resource Sharing (CORS) is a security mechanism that uses HTTP headers to tell browsers whether to allow a web application to access resources from a different origin. It prevents malicious sites from fetching sensitive data from other domains.",
+      keywords: ["security", "headers", "origin", "browser", "domains", "access", "resource"]
+    },
+    { 
+      id: 4, 
+      question: "What is your process for testing a web application?",
+      referenceAnswer: "My process includes unit testing for individual logic, integration testing for component interaction, and end-to-end testing with tools like Cypress to simulate real user journeys across the entire app.",
+      keywords: ["unit testing", "integration", "end-to-end", "Cypress", "user journey", "simulate", "interaction"]
+    },
+    { 
+      id: 5, 
+      question: "How do you stay updated with the latest web technologies and trends?",
+      referenceAnswer: "I follow industry blogs (like CSS-Tricks), subscribe to newsletters (like JavaScript Weekly), participate in GitHub discussions, and experiment with new frameworks in personal side projects.",
+      keywords: ["blogs", "newsletters", "GitHub", "experiment", "projects", "community", "trends"]
+    }
+  ],
+  "uiux": [
+    { 
+      id: 1, 
+      question: "How do you balance user needs with business requirements in your designs?",
+      referenceAnswer: "I identify common ground where user satisfaction aligns with business goals, use data-driven insights to prioritize features, and use prototypes to demonstrate how a better user experience leads to better business metrics like conversion.",
+      keywords: ["satisfaction", "align", "data-driven", "prototype", "experience", "metrics", "conversion"]
+    },
+    { 
+      id: 2, 
+      question: "Walk me through your design thinking process for a new feature.",
+      referenceAnswer: "I follow the steps: Empathize with the user, Define the problem, Ideate solutions, Prototype the best ideas, and Test with real users to iterate and improve.",
+      keywords: ["empathize", "define", "ideate", "prototype", "test", "iterate", "design thinking"]
+    },
+    { 
+      id: 3, 
+      question: "How do you conduct user research and what methods do you prefer?",
+      referenceAnswer: "I use a mix of qualitative methods like interviews and usability tests for depth, and quantitative methods like surveys or heatmaps for breadth. My choice depends on the specific project stage and goals.",
+      keywords: ["qualitative", "interviews", "usability tests", "quantitative", "surveys", "heatmaps", "research"]
+    },
+    { 
+      id: 4, 
+      question: "Tell me about a time you had to defend a design decision to stakeholders.",
+      referenceAnswer: "I rely on user data, usability principles, and clear design rationale. I show how my decision solves specific user pain points and connects to the overall business objectives or technical constraints.",
+      keywords: ["user data", "principles", "rationale", "pain points", "objectives", "defend", "stakeholders"]
+    },
+    { 
+      id: 5, 
+      question: "What tools do you use for prototyping and why?",
+      referenceAnswer: "Figma is my primary tool for collaborative design and prototyping, while tools like Adobe XD or Protopie are used for high-fidelity interactive elements that need complex logic or animations.",
+      keywords: ["Figma", "collaborative", "Adobe XD", "Protopie", "high-fidelity", "interactive", "animations"]
+    }
+  ],
+  "ai-engineer": [
+    { 
+      id: 1, 
+      question: "Explain the architecture of a Transformer model.",
+      referenceAnswer: "Transformers use an encoder-decoder structure based on the self-attention mechanism. It allows the model to process sequences in parallel and weight the importance of different words regardless of their position in the sentence.",
+      keywords: ["encoder", "decoder", "self-attention", "parallel", "weight", "sequences", "architecture"]
+    },
+    { 
+      id: 2, 
+      question: "How do you deal with data bias in AI models?",
+      referenceAnswer: "I perform rigorous exploratory data analysis to identify imbalances, use techniques like oversampling or data augmentation to balance the training set, and evaluate the model using fairness metrics across different demographic groups.",
+      keywords: ["bias", "EDA", "imbalance", "oversampling", "augmentation", "fairness", "demographic"]
+    },
+    { 
+      id: 3, 
+      question: "What is the difference between PyTorch and TensorFlow in your experience?",
+      referenceAnswer: "PyTorch offers a more dynamic computational graph which is flexible for research, while TensorFlow (especially with Keras) provides strong production deployment tools and a more static graph approach which can be highly optimized.",
+      keywords: ["dynamic", "flexible", "research", "TensorFlow", "deployment", "static", "optimized", "graph"]
+    },
+    { 
+      id: 4, 
+      question: "How do you deploy an AI model to production at scale?",
+      referenceAnswer: "I containerize the model using Docker, use an API framework like FastAPI for inference, deploy on cloud clusters using Kubernetes for auto-scaling, and implement model monitoring to track drift and performance.",
+      keywords: ["Docker", "FastAPI", "Kubernetes", "auto-scaling", "monitoring", "inference", "scale"]
+    },
+    { 
+      id: 5, 
+      question: "What are some ethical considerations when developing AI systems?",
+      referenceAnswer: "Major considerations include transparency (how the model makes decisions), privacy (how user data is handled), and accountability for any harm or errors the model might cause, as well as ecological impact of training large models.",
+      keywords: ["transparency", "privacy", "accountability", "ethics", "data", "harm", "ecological"]
+    }
+  ],
+  "cybersecurity": [
+    { 
+      id: 1, 
+      question: "What is the principle of 'Defense in Depth'?",
+      referenceAnswer: "Defense in Depth is a cybersecurity approach where multiple layers of security controls are placed throughout an IT system. It ensures that if one control fails, others are in place to block the attack.",
+      keywords: ["multiple layers", "controls", "redundancy", " cybersecurity", "block", "attack"]
+    },
+    { 
+      id: 2, 
+      question: "How do you identify a possible SQL injection vulnerability?",
+      referenceAnswer: "I look for places where user input is directly concatenated into database queries without proper sanitization. Testing involves injecting single quotes or SQL commands into input fields to see if error messages or unexpected data are returned.",
+      keywords: ["concatenated", "sanitization", "single quotes", "commands", "queries", "vulnerability"]
+    },
+    { 
+      id: 3, 
+      question: "Explain the difference between Symmetric and Asymmetric encryption.",
+      referenceAnswer: "Symmetric encryption uses a single secret key for both encryption and decryption. Asymmetric encryption uses a public key to encrypt and a private key (owned only by the recipient) to decrypt, which is more secure for communication.",
+      keywords: ["single key", "secret", "public key", "private key", "communication", "secure", "encryption"]
+    },
+    { 
+      id: 4, 
+      question: "What are the first steps you would take during an incident response?",
+      referenceAnswer: "I follow the SANS steps: Preparation, Identification (confirming the breach), Containment (stopping the spread), Eradication (removing the threat), Recovery, and Lessons Learned.",
+      keywords: ["Identification", "Containment", "Eradication", "Recovery", "incident", "breach", "spread"]
+    },
+    { 
+      id: 5, 
+      question: "How do you stay informed about the latest cyber threats and CVEs?",
+      referenceAnswer: "I monitor databases like MITRE's CVE list, follow security researchers on social media, attend conferences like DEF CON or Black Hat, and read security advisories from vendors and organizations like CISA.",
+      keywords: ["CVE", "MITRE", "researchers", "conferences", "advisories", "vendors", "threats"]
+    }
+  ],
+  "devops": [
+    { 
+      id: 1, 
+      question: "How do you implement a Zero-Downtime deployment strategy?",
+      referenceAnswer: "I use methods like Blue-Green deployment, where two identical environments are switched, or Canary releases, where changes are gradually rolled out to a small subset of users to monitor for errors before full deployment.",
+      keywords: ["Blue-Green", "Canary", "rolled out", "environments", "switch", "monitor", "zero-downtime"]
+    },
+    { 
+      id: 2, 
+      question: "What are the benefits of using Infrastructure as Code (IaC)?",
+      referenceAnswer: "IaC allows for consistency across environments, enables version control for infrastructure, reduces human error in manual setups, and allows for rapid, automated provisioning of resources.",
+      keywords: ["consistency", "version control", "automation", "human error", "provisioning", "infrastructure"]
+    },
+    { 
+      id: 3, 
+      question: "Explain the role of Kubernetes in a microservices architecture.",
+      referenceAnswer: "Kubernetes automates the deployment, scaling, and management of containerized microservices. It handles service discovery, load balancing, self-healing by restarting failed containers, and rollout/rollback features.",
+      keywords: ["automates", "scaling", "management", "discovery", "load balancing", "self-healing", "containers"]
+    },
+    { 
+      id: 4, 
+      question: "How do you monitor system health in a cloud-native environment?",
+      referenceAnswer: "I collect metrics (like CPU/Memory) using Prometheus, aggregate logs using an ELK or EFK stack, and use tracing (like Jaeger) to understand request flow across different microservices.",
+      keywords: ["metrics", "Prometheus", "logs", "ELK", "tracing", "Jaeger", "health", "cloud-native"]
+    },
+    { 
+      id: 5, 
+      question: "Tell me about a time you automated a manual process to improve efficiency.",
+      referenceAnswer: "The answer should describe a specific repetitive task (like server patching), the tool used (Bash, Ansible, or Terraform), and the measurable result (e.g., time saved from 4 hours to 5 minutes).",
+      keywords: ["manual", "automated", "tool", "repetitive", "efficiency", "patching", "result"]
+    }
+  ],
+  "mobile-dev": [
+    { 
+      id: 1, 
+      question: "What are the key differences between native and cross-platform development?",
+      referenceAnswer: "Native development uses platform-specific languages (Swift/Kotlin) for best performance and API access. Cross-platform (React Native/Flutter) uses a single codebase for both iOS and Android, which is faster to develop but might have slight performance trade-offs.",
+      keywords: ["platform-specific", "Swift", "Kotlin", "cross-platform", "single codebase", "performance", "API"]
+    },
+    { 
+      id: 2, 
+      question: "How do you manage state in a complex mobile application?",
+      referenceAnswer: "I use libraries like Redux, Provider, or Bloc to maintain a predictable global state, and utilize local state for component-specific UI logic, ensuring data consistency across different screens.",
+      keywords: ["Redux", "Provider", "Bloc", "global state", "predictable", "local state", "consistency"]
+    },
+    { 
+      id: 3, 
+      question: "What is your approach to mobile app security and data privacy?",
+      referenceAnswer: "I use secure storage (Keychain/Keystore) for sensitive data, implement SSL pinning for API communication, follow the principle of least privilege for app permissions, and ensure data is encrypted both at rest and in transit.",
+      keywords: ["secure storage", "SSL pinning", "least privilege", "permissions", "encrypted", "privacy", "security"]
+    },
+    { 
+      id: 4, 
+      question: "How do you handle background tasks on iOS and Android?",
+      referenceAnswer: "I use platform-specific managers like WorkManager for Android and BackgroundTasks framework for iOS, ensuring tasks are performed efficiently without excessively draining the device's battery.",
+      keywords: ["WorkManager", "BackgroundTasks", "platform-specific", "battery", "efficient", "OS"]
+    },
+    { 
+      id: 5, 
+      question: "Walk me through the process of publishing an app to the App Store or Play Store.",
+      referenceAnswer: "I first optimize the app build, create store listings with assets, set up app permissions and privacy policies, submit for review, and once approved, manage releases and monitor early crashes or feedback.",
+      keywords: ["build", "store listings", "privacy policy", "review", "approved", "releases", "monitor", "publishing"]
+    }
+  ]
+};
+
+export const getVoiceQuestions = (careerId: string): VoiceInterviewQuestion[] => {
+  return voiceInterviewBank[careerId] || voiceInterviewBank["software-dev"];
+};
