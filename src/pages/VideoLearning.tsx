@@ -183,16 +183,23 @@ const VideoLearning = () => {
 
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
             <div className="lg:col-span-2">
-              <div className="aspect-video bg-black rounded-lg overflow-hidden">
-                <iframe
-                  width="100%"
-                  height="100%"
-                  src={`https://www.youtube.com/embed/${currentVideo.youtubeId}`}
-                  title={currentVideo.title}
-                  frameBorder="0"
-                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                  allowFullScreen
-                />
+              <div className="aspect-video bg-black rounded-lg overflow-hidden flex items-center justify-center relative">
+                {currentVideo.youtubeId ? (
+                  <iframe
+                    className="w-full h-full absolute inset-0"
+                    src={`https://www.youtube.com/embed/${currentVideo.youtubeId}`}
+                    title={currentVideo.title}
+                    frameBorder="0"
+                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                    allowFullScreen
+                  />
+                ) : (
+                  <div className="flex flex-col items-center justify-center p-8 text-center text-slate-400">
+                    <Clock className="h-10 w-10 mb-3 opacity-50" />
+                    <p className="text-lg font-medium">Video content coming soon.</p>
+                    <p className="text-sm mt-1 opacity-70">This lesson is currently a Text Module.</p>
+                  </div>
+                )}
               </div>
               <div className="mt-4 flex items-center justify-between">
                 <div className="flex items-center gap-4">

@@ -86,10 +86,23 @@ const Roadmap = () => {
         { id: `data-analysis`, title: `Data Analysis Basics`, videoId: "r-uOLxNrNk8" },
         { id: `machine-learning`, title: `Machine Learning Intro`, videoId: "Gv9_4yMHFhI" }
       ];
+    } else if (lower.includes('pytorch')) {
+      return [
+        { id: `pytorch-1`, title: `Lesson 1: PyTorch Basics & Tensors`, videoId: "V_xro1bcAuA" },
+        { id: `pytorch-2`, title: `Lesson 2: Building a Neural Network`, videoId: "Z_ikDlimN6A" },
+        { id: `pytorch-3`, title: `Lesson 3: Training the Model`, videoId: "v5cngxo4mIg" }
+      ];
+    } else if (lower.includes('deep learning')) {
+      return [
+        { id: `dl-1`, title: `Introduction to Deep Learning`, videoId: "gmjzdiAxc1c" },
+        { id: `dl-2`, title: `Advanced Deep Learning Concepts`, videoId: "" },
+        { id: `dl-3`, title: `Convolutional Neural Networks (CNNs)`, videoId: "HGwBXDKFk9I" }
+      ];
     }
+    
     return [
-      { id: `intro-${modName.toLowerCase().replace(/\s+/g, '-')}`, title: `Introduction to ${modName}`, videoId: "PkZNo7MFNFg" },
-      { id: `advanced-${modName.toLowerCase().replace(/\s+/g, '-')}`, title: `Advanced ${modName} Concepts`, videoId: "bJzb-RuUcMU" }
+      { id: `intro-${modName.toLowerCase().replace(/\s+/g, '-')}`, title: `Introduction to ${modName}`, videoId: "" },
+      { id: `advanced-${modName.toLowerCase().replace(/\s+/g, '-')}`, title: `Advanced ${modName} Concepts`, videoId: "" }
     ];
   };
 
@@ -274,7 +287,12 @@ const Roadmap = () => {
                     <div 
                       key={lesson.id} 
                       className={`p-4 rounded-xl border transition-colors ${isLocked ? 'opacity-60 bg-muted cursor-not-allowed' : 'bg-card hover:bg-accent/5 cursor-pointer'}`} 
-                      onClick={() => !isLocked && handleLessonOpen(activeModule, lesson.id)}
+                      onClick={() => {
+                        if (!isLocked) {
+                          console.log('Clicked URL:', lesson.videoId || lesson.id);
+                          handleLessonOpen(activeModule, lesson.id);
+                        }
+                      }}
                     >
                       <div className="flex items-start justify-between">
                         <div className="flex gap-4 items-center">
@@ -315,14 +333,22 @@ const Roadmap = () => {
                 </Button>
                 
                 <div className="w-full aspect-video bg-black rounded-xl overflow-hidden shadow-2xl mb-6 relative">
-                  <YouTube 
-                    videoId={getLessonsForModule(modules.find(m => m.toLowerCase().replace(/\s+/g, '-') === activeModule) || "").find(l => l.id === activeLesson)?.videoId}
-                    className="w-full h-full absolute inset-0"
-                    opts={{ width: '100%', height: '100%', playerVars: { autoplay: 1 } }}
-                    onEnd={handleVideoEnd}
-                    onPlay={handleVideoPlay}
-                    onReady={(e) => { playerRef.current = e.target; }}
-                  />
+                  {getLessonsForModule(modules.find(m => m.toLowerCase().replace(/\s+/g, '-') === activeModule) || "").find(l => l.id === activeLesson)?.videoId ? (
+                    <YouTube 
+                      videoId={getLessonsForModule(modules.find(m => m.toLowerCase().replace(/\s+/g, '-') === activeModule) || "").find(l => l.id === activeLesson)?.videoId}
+                      className="w-full h-full absolute inset-0 player"
+                      opts={{ width: '100%', height: '100%', playerVars: { autoplay: 1 } }}
+                      onEnd={handleVideoEnd}
+                      onPlay={handleVideoPlay}
+                      onReady={(e) => { playerRef.current = e.target; }}
+                    />
+                  ) : (
+                    <div className="w-full h-full flex items-center justify-center p-8 bg-slate-800/80 border border-slate-700">
+                      <span className="text-xl md:text-2xl font-semibold text-slate-300 animate-pulse tracking-wide">
+                        Video Content Coming Soon
+                      </span>
+                    </div>
+                  )}
                 </div>
                 
                 <div className="flex w-full justify-between items-center bg-secondary/30 p-4 rounded-lg">

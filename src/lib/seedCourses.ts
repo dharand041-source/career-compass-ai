@@ -86,6 +86,13 @@ const sampleLessons = [
     duration: 9300, // 2.5 hours
     order_index: 2,
   },
+  {
+    course_id: "data-science-python",
+    title: "Deep Learning Foundations",
+    youtube_id: "VyWAvY2CF9c",
+    duration: 10800, // 3 hours
+    order_index: 3,
+  },
 ];
 
 export async function seedCourses() {
