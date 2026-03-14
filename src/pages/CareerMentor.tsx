@@ -15,14 +15,16 @@ import Navbar from "@/components/Navbar";
 import { careers } from "@/data/careers";
 import { Link, useNavigate } from "react-router-dom";
 import BackButton from "@/components/BackButton";
+import { getAiCoaching } from "@/lib/aiCoachService";
 
 interface Message {
   id: string;
   text: string;
   isBot: boolean;
   timestamp: Date;
-  type?: "text" | "guidance" | "roadmap";
+  type?: "text" | "guidance" | "roadmap" | "coaching";
   suggestedRoadmap?: any;
+  coachingData?: any;
 }
 
 const CareerMentor = () => {
@@ -112,23 +114,27 @@ const CareerMentor = () => {
     }, 1500);
   };
 
-  const generateGuidance = (finalInput: string) => {
+  const generateGuidance = async (finalInput: string) => {
     // Simulate complex analysis
-    setTimeout(() => {
+    setTimeout(async () => {
       const careerData = careers.find(c => 
         c.title.toLowerCase().includes(userData.interest.toLowerCase()) || 
         userData.interest.toLowerCase().includes(c.title.toLowerCase())
       ) || careers[0];
 
+      const coaching = await getAiCoaching(userData.skills.split(",").map(s => s.trim()), { projects: userData.techStack });
+
       addMessage({
-        text: `Based on your interest in ${userData.interest} and your background as a ${userData.level}, here is my personalized career analysis and roadmap for you:`,
+        text: `Based on your interest in ${userData.interest} and your background as a ${userData.level}, here is my personalized career analysis:`,
         isBot: true,
         type: "guidance"
       });
 
       addMessage({
-        text: `You have a great foundation in ${userData.skills}. To become a top-tier ${userData.interest}, you should focus on bridging the gap in advanced ${careerData.skills.slice(-2).join(" and ")}.`,
+        text: coaching.explanation,
         isBot: true,
+        type: "coaching",
+        coachingData: coaching
       });
 
       addMessage({
@@ -138,7 +144,7 @@ const CareerMentor = () => {
         suggestedRoadmap: {
           career: careerData.title,
           steps: [
-            "Master the fundamentals of " + careerData.skills[0],
+            ...coaching.actionPlan.map(a => `Master ${a}`),
             "Build 3 high-impact projects using " + userData.techStack,
             "Complete our specialized " + careerData.title + " learning path",
             "Prepare for interviews with our AI Mock Interview tool"
@@ -294,6 +300,27 @@ const CareerMentor = () => {
                                     Start This Path <ArrowRight className="ml-2 h-4 w-4 group-hover:translate-x-1 transition-transform" />
                                   </Button>
                                 </Link>
+                              </div>
+                            )}
+
+                            {m.type === "coaching" && m.coachingData && (
+                              <div className="mt-4 space-y-4 pt-4 border-t border-white/10">
+                                <div>
+                                  <h4 className="text-[10px] font-bold uppercase text-cyan-400 mb-2">Expert Analysis</h4>
+                                  <div className="flex flex-wrap gap-2">
+                                    {m.coachingData.actionPlan.map((item: string, i: number) => (
+                                      <Badge key={i} className="bg-purple-500/20 text-purple-300 border-purple-500/30 text-[9px]">
+                                        {item}
+                                      </Badge>
+                                    ))}
+                                  </div>
+                                </div>
+                                {m.coachingData.adjacentRoles && (
+                                  <div>
+                                    <h4 className="text-[10px] font-bold uppercase text-slate-500 mb-1">Adjacent Career Paths</h4>
+                                    <p className="text-[10px] text-slate-400">{m.coachingData.adjacentRoles.join(", ")}</p>
+                                  </div>
+                                )}
                               </div>
                             )}
                           </div>

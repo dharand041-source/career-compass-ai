@@ -16,6 +16,7 @@ import { Progress } from "@/components/ui/progress";
 import Navbar from "@/components/Navbar";
 import { careers } from "@/data/careers";
 import { getUserProfile, Job, fetchJobsForUser } from "@/lib/jobService";
+import { getAiCoaching } from "@/lib/aiCoachService";
 import { Link, useNavigate } from "react-router-dom";
 import BackButton from "@/components/BackButton";
 
@@ -24,9 +25,10 @@ interface Message {
   text: string;
   isBot: boolean;
   timestamp: Date;
-  type?: "text" | "recommendation" | "input_request";
+  type?: "text" | "recommendation" | "input_request" | "coaching";
   recommendations?: Job[];
   suggestedCourses?: any[];
+  coachingData?: any;
 }
 
 interface UserDetails {
@@ -135,6 +137,8 @@ const JobsInternships = () => {
 
         const careerData = careers.find(c => c.title.toLowerCase().includes(userDetails.field.toLowerCase()) || userDetails.field.toLowerCase().includes(c.title.toLowerCase()));
         
+        const coaching = await getAiCoaching(userSkills, { projects: "previous work" });
+        
         addMessage({ 
           text: `I've found ${scoredMatches.length} job opportunities that match your profile! Here are the best ones for you.`, 
           isBot: true,
@@ -142,19 +146,14 @@ const JobsInternships = () => {
           recommendations: scoredMatches.slice(0, 3)
         });
 
-        if (gaps.length > 0) {
-          addMessage({
-            text: `I noticed you're missing some skills for top-tier roles: ${gaps.join(", ")}. I recommend checking out these modules to boost your profile:`,
-            isBot: true,
-            type: "text"
-          });
-          
-          if (careerData) {
-            setSuggestedRoadmap(careerData.skills.filter(s => gaps.includes(s)).map(s => ({ name: s, careerId: careerData.id })));
-          }
-        }
+        addMessage({
+          text: coaching.explanation,
+          isBot: true,
+          type: "coaching",
+          coachingData: coaching
+        });
 
-        botResponse = "You can view all your matches in the 'Opportunities' tab. I'll continue to update these as you learn new skills!";
+        botResponse = "Check out the 'Opportunities' and 'Action Plan' tags for more details!";
         nextStep = 6;
       } else {
         botResponse = "I'm here to help! Do you want to refine your search or ask about a specific role?";
@@ -217,6 +216,27 @@ const JobsInternships = () => {
                                   </Button>
                                 </div>
                               ))}
+                            </div>
+                          )}
+
+                          {m.type === "coaching" && m.coachingData && (
+                            <div className="mt-4 space-y-4 pt-4 border-t border-white/10">
+                              <div>
+                                <h5 className="text-[10px] font-bold uppercase text-cyan-400 mb-2">Expert Action Plan</h5>
+                                <div className="flex flex-wrap gap-2">
+                                  {m.coachingData.actionPlan.map((item: string, i: number) => (
+                                    <Badge key={i} className="bg-purple-500/20 text-purple-300 border-purple-500/30 text-[9px]">
+                                      {item}
+                                    </Badge>
+                                  ))}
+                                </div>
+                              </div>
+                              {m.coachingData.adjacentRoles && (
+                                <div>
+                                  <h5 className="text-[10px] font-bold uppercase text-slate-500 mb-1">Adjacent Roles</h5>
+                                  <p className="text-[10px] text-slate-400">{m.coachingData.adjacentRoles.join(", ")}</p>
+                                </div>
+                              )}
                             </div>
                           )}
                           

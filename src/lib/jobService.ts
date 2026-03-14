@@ -27,7 +27,7 @@ export interface UserProfile {
 const delay = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
 
 // Calculate match score based on user skills and job requirements
-const calculateMatchScore = (userSkills: string[], jobRequirements: string[]): number => {
+export const calculateMatchScore = (userSkills: string[], jobRequirements: string[]): number => {
   if (!userSkills || !Array.isArray(userSkills) || userSkills.length === 0) return 0;
   if (!jobRequirements || !Array.isArray(jobRequirements) || jobRequirements.length === 0) return 0;
 

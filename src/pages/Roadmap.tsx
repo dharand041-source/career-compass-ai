@@ -1,7 +1,7 @@
 import { useParams, useLocation, Link, useNavigate } from "react-router-dom";
 import BackButton from "@/components/BackButton";
 import { motion, AnimatePresence } from "framer-motion";
-import { CheckCircle2, Circle, Play, ArrowRight, Award, BookOpen, X, Check, Laptop, Lock, ArrowLeft } from "lucide-react";
+import { CheckCircle2, Circle, Play, ArrowRight, Award, BookOpen, X, Check, Laptop, Lock, ArrowLeft, Loader2 } from "lucide-react";
 import { useState, useEffect, useRef } from "react";
 import { careers } from "@/data/careers";
 import GlassCard from "@/components/GlassCard";
@@ -31,6 +31,100 @@ const Roadmap = () => {
   const [activeLesson, setActiveLesson] = useState<string | null>(null);
   const [lessonProgress, setLessonProgress] = useState<Record<string, "Not Started" | "In Progress" | "Completed">>({});
   const playerRef = useRef<any>(null);
+  const [moshVideoId, setMoshVideoId] = useState<string>("W6NZfCO5SIk");
+  const [isVideoLoading, setIsVideoLoading] = useState(false);
+
+  const openSkillLesson = (skillName: string) => {
+    setIsVideoLoading(true);
+    
+    // Step 1: Normalize skill name
+    const normalizedKey = skillName.toLowerCase().replace(/[^a-z0-9]/g, '');
+    
+    // Step 2: Skill Mapping Object
+    const skillVideos: Record<string, string> = {
+      "javascript": "W6NZfCO5SIk",
+      "react": "SqcY0GlETPk",
+      "typescript": "d56mG7DezGs",
+      "tailwindcss": "_9mTJ84uL1Q",
+      "nodejs": "TlB_eWDSMt4",
+      "git": "s14jwD-_Dds",
+      "responsivedesign": "_9mTJ84uL1Q",
+      "python": "kqtD5dpn9C8",
+      "sql": "7S_tz1z_5bA",
+      "machinelearning": "7eh4d6sabA0",
+      "pandas": "vtgDGrUiUKk",
+      "statistics": "7eh4d6sabA0",
+      "tensorflow": "9NsfX9W80rw",
+      "htmlcss": "_9mTJ84uL1Q",
+      "colortheory": "2QTHs7QSR9o",
+      "r": "_V8eKsto3Ug",
+      "docker": "exmSJpJvIPs",
+      "kubernetes": "X48VuDVv0do",
+      "cicd": "qP8kir2GUgo",
+      "awsgcp": "K3bclpu1kus",
+      "terraform": "CsLIyHtwojM",
+      "monitoring": "aljzrNEqNDw",
+      "scripting": "6GQRb4fGvtk",
+      "restapi": "PKU0QTGPvac",
+      "figma": "jQ1sfKIl50E",
+      "userresearch": "bAARmsv1tms",
+      "wireframing": "qWIdforZ9x0",
+      "prototyping": "8tHJgtbj6rs",
+      "designsystems": "opTANvl9G1g",
+      "typography": "9w-BwzcuxYM",
+      "usabilitytesting": "nYCJTea1AUQ",
+      "reactnative": "0-S5a0eXPoc",
+      "flutter": "3kaGC_DrUnw",
+      "swiftios": "-VC3hIEL7eQ",
+      "swift": "-VC3hIEL7eQ",
+      "kotlinandroid": "dzUc9vrsldM",
+      "kotlin": "dzUc9vrsldM",
+      "restapis": "7S_tz1z_5bA",
+      "statemanagement": "SqcY0GlETPk?start=2683",
+      "appdeployment": "BeGRq7BPsd8",
+      "appstoredeployment": "BeGRq7BPsd8",
+      "uidesign": "HoKD1qIcchQ",
+      "deeplearning": "7eh4d6adAUt",
+      "pytorch": "7eh4d6adAUt",
+      "nlp": "DDoK3bvi7lw",
+      "computervision": "DDoK3bvi7lw",
+      "mlops": "DDoK3bvi7lw",
+      "mathematics": "MFBsqQnq-Ec",
+      "cloudplatforms": "gJrjgg1KVL4",
+      "networksecurity": "gdiao7L9GjE",
+      "linux": "1oTuMPIwHmk",
+      "ethicalhacking": "gdiao7L9GjE",
+      "siem": "gdiao7L9GjE",
+      "firewalls": "gJrjgg1KVL4",
+      "incidentresponse": "gdiao7L9GjE",
+      "cryptography": "gdiao7L9GjE",
+      "compliance": "f9SbaAnf1sY"
+    };
+
+    // Step 5: Error Handling / Fallback
+    let videoId = skillVideos[normalizedKey];
+    
+    if (!videoId && careerId === "data-scientist") {
+      videoId = "dcqPhpLi7kv";
+    }
+
+    if (!videoId) {
+      console.warn(`Skill "${skillName}" (normalized: "${normalizedKey}") not found. Defaulting to channel trailer.`);
+      videoId = "f9SbaAnf1sY"; // Programming with Mosh channel trailer
+    }
+
+    setMoshVideoId(videoId);
+    
+    const modId = skillName.toLowerCase().replace(/\s+/g, '-');
+    setActiveModule(modId);
+  };
+
+  // Step 6: Clear iframe source on close
+  const handleCloseModal = () => {
+    setActiveModule(null);
+    setActiveLesson(null);
+    setMoshVideoId(""); 
+  };
 
   // Initialize progress from localStorage
   useEffect(() => {
@@ -226,7 +320,7 @@ const Roadmap = () => {
                 animate={{ opacity: 1, x: 0 }}
                 transition={{ delay: i * 0.08 }}
               >
-                <GlassCard hover className="flex flex-col sm:flex-row sm:items-center gap-4 cursor-pointer transition-all border border-transparent hover:border-primary/20" onClick={() => setActiveModule(modId)}>
+                <GlassCard hover className="flex flex-col sm:flex-row sm:items-center gap-4 cursor-pointer transition-all border border-transparent hover:border-primary/20" onClick={() => openSkillLesson(skill)}>
                   <div className="shrink-0 flex items-center justify-center pt-1 sm:pt-0">
                     {isCompleted ? (
                       <CheckCircle2 className="h-7 w-7 text-green-500 drop-shadow-sm" />
@@ -244,7 +338,7 @@ const Roadmap = () => {
                     </div>
                   </div>
                   <div className="flex items-center gap-2 mt-4 sm:mt-0">
-                    <Button variant={isCompleted ? "outline" : "default"} size="sm" onClick={(e) => { e.stopPropagation(); setActiveModule(modId); }} className="w-full sm:w-auto">
+                    <Button variant={isCompleted ? "outline" : "default"} size="sm" onClick={(e) => { e.stopPropagation(); openSkillLesson(skill); }} className="w-full sm:w-auto">
                       <BookOpen className="h-4 w-4 mr-2" />
                       View Lessons
                     </Button>
@@ -267,7 +361,7 @@ const Roadmap = () => {
         </div>
 
         {/* Module Lessons Modal */}
-        <Dialog open={!!activeModule} onOpenChange={(open) => !open && setActiveModule(null)}>
+        <Dialog open={!!activeModule} onOpenChange={(open) => !open && handleCloseModal()}>
           <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto">
             <DialogHeader>
               <DialogTitle className="text-2xl font-bold flex items-center gap-2">
@@ -327,7 +421,10 @@ const Roadmap = () => {
                 <Button 
                   variant="ghost" 
                   className="self-start mb-4 text-slate-400 hover:text-white hover:bg-white/5" 
-                  onClick={() => setActiveLesson(null)}
+                  onClick={() => {
+                    setActiveLesson(null);
+                    setMoshVideoId(""); 
+                  }}
                 >
                   <ArrowLeft className="h-4 w-4 mr-2" /> Back to Lessons
                 </Button>
@@ -342,13 +439,33 @@ const Roadmap = () => {
                       onPlay={handleVideoPlay}
                       onReady={(e) => { playerRef.current = e.target; }}
                     />
-                  ) : (
-                    <div className="w-full h-full flex items-center justify-center p-8 bg-slate-800/80 border border-slate-700">
-                      <span className="text-xl md:text-2xl font-semibold text-slate-300 animate-pulse tracking-wide">
-                        Video Content Coming Soon
-                      </span>
-                    </div>
-                  )}
+                    ) : (
+                      moshVideoId ? (
+                        <div className="w-full h-full relative" style={{ borderRadius: '8px', overflow: 'hidden' }}>
+                          {isVideoLoading && (
+                            <div className="absolute inset-0 z-10 flex flex-col items-center justify-center bg-slate-900/80 backdrop-blur-sm">
+                              <Loader2 className="h-10 w-10 text-primary animate-spin mb-2" />
+                              <p className="text-sm font-medium text-slate-300">Please Wait...</p>
+                            </div>
+                          )}
+                          <iframe
+                            className="w-full h-full absolute inset-0 player"
+                            src={`https://www.youtube.com/embed/${moshVideoId}`}
+                            title="Module Lesson"
+                            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                            referrerPolicy="strict-origin-when-cross-origin"
+                            allowFullScreen
+                            onLoad={() => setIsVideoLoading(false)}
+                          ></iframe>
+                        </div>
+                      ) : (
+                        <div className="w-full h-full flex items-center justify-center p-8 bg-slate-800/80 border border-slate-700">
+                          <span className="text-xl md:text-2xl font-semibold text-slate-300 animate-pulse tracking-wide">
+                            Video Content Coming Soon
+                          </span>
+                        </div>
+                      )
+                    )}
                 </div>
                 
                 <div className="flex w-full justify-between items-center bg-secondary/30 p-4 rounded-lg">
