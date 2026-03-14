@@ -84,7 +84,7 @@ const Roadmap = () => {
       "appdeployment": "BeGRq7BPsd8",
       "appstoredeployment": "BeGRq7BPsd8",
       "uidesign": "HoKD1qIcchQ",
-      "deeplearning": "7eh4d6adAUt",
+      "deeplearning": "_uQrJ0TkZlc",
       "pytorch": "7eh4d6adAUt",
       "nlp": "DDoK3bvi7lw",
       "computervision": "DDoK3bvi7lw",
